@@ -27,6 +27,7 @@ class User extends Authenticatable
         'address',
         'company_name',
         'store_numbers',
+        'image'
     ];
 
     /**
@@ -68,4 +69,10 @@ class User extends Authenticatable
     {
         return $query->where('type', 'client');
     }
+
+    public function getImageUrlAttribute(): string
+    {
+        return $this->image ? asset( $this->image) : asset('images/default.png');
+    }
+
 }

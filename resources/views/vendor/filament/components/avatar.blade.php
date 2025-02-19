@@ -4,7 +4,9 @@
 ])
 
 <img
+    src="{{ auth()->user()->image_url }}"
     {{
+
         $attributes
             ->class([
                 'fi-avatar object-cover object-center',

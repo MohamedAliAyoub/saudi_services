@@ -8,6 +8,8 @@ use App\Filament\Client\Resources\VisitResource\RelationManagers;
 use App\Models\Visit;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Infolists\Components\ImageEntry;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -24,6 +26,7 @@ class VisitResource extends Resource
     {
         return false;
     }
+
     public static function form(Form $form): Form
     {
         return $form
@@ -55,11 +58,10 @@ class VisitResource extends Resource
                 Forms\Components\Hidden::make('status')
                     ->default("pending")
                     ->required(),
-
             ]);
     }
 
-    public static function table(Tables\Table $table): Tables\Table
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -71,7 +73,7 @@ class VisitResource extends Resource
                     ->dateTime('H:i:s'),
                 Tables\Columns\TextColumn::make('translated_status')
                     ->label(__('message.STATUS'))
-                   ->searchable()
+                    ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('comment')
                     ->label(__('message.COMMENT')),
@@ -85,14 +87,29 @@ class VisitResource extends Resource
                     ->sortable(),
             ])
             ->filters([
-                //
-            ])
+                Tables\Filters\SelectFilter::make('status')
+                    ->label(__('message.STATUS'))
+                    ->options([
+                        'pending' => __('message.pending'),
+                        'done' => __('message.done'),
+                        'late' => __('message.late'),
+                    ])
+            ] )
             ->actions([
-//                Tables\Actions\EditAction::make(),
                 Tables\Actions\ViewAction::make(),
             ])
             ->bulkActions([
                 // No bulk actions
+            ]);
+    }
+
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                ImageEntry::make('images.full_path')
+                    ->label(__('message.IMAGES'))
+                    ->columnSpanFull(),
             ]);
     }
 
@@ -115,10 +132,12 @@ class VisitResource extends Resource
     {
         return __('message.VISITS');
     }
+
     public static function getNavigationBadge(): ?string
     {
-        return static::getModel()::query()->where('id' , auth()->id())->count();
+        return static::getModel()::query()->where('id', auth()->id())->count();
     }
+
     public static function getTitle(): string
     {
         return __('message.visit');
@@ -128,10 +147,9 @@ class VisitResource extends Resource
     {
         return __('message.visit');
     }
+
     public static function getPluralModelLabel(): string
     {
         return __('message.visit');
     }
-
-
 }

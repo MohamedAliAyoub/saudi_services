@@ -10,6 +10,7 @@ use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\MenuItem;
 use Filament\Navigation\NavigationGroup;
 use Filament\Navigation\NavigationItem;
 use Filament\Navigation\UserMenuItem;
@@ -40,10 +41,12 @@ class ClientPanelProvider extends PanelProvider
                     ->url(fn() => route('change-language', ['lang' => 'en']))
                     ->icon('heroicon-o-language'),
                 UserMenuItem::make()
+
                     ->label(__('اللغة العربية'))
                     ->url(fn() => route('change-language', ['lang' => 'ar']))
                     ->icon('heroicon-o-globe-asia-australia'),
             ])
+
             ->colors([
                 'primary' => Color::Amber,
             ])
