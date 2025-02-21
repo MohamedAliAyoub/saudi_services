@@ -13,7 +13,7 @@ class ServicePolicy
      */
     public function viewAny(User $user): bool
     {
-        //
+        return true;
     }
 
     /**
@@ -21,7 +21,8 @@ class ServicePolicy
      */
     public function view(User $user, Service $service): bool
     {
-        //
+        return true;
+
     }
 
     /**
@@ -29,7 +30,7 @@ class ServicePolicy
      */
     public function create(User $user): bool
     {
-        //
+        return true;
     }
 
     /**
@@ -37,7 +38,7 @@ class ServicePolicy
      */
     public function update(User $user, Service $service): bool
     {
-        //
+        return true;
     }
 
     /**
@@ -45,7 +46,7 @@ class ServicePolicy
      */
     public function delete(User $user, Service $service): bool
     {
-        //
+        return true;
     }
 
     /**
@@ -53,7 +54,7 @@ class ServicePolicy
      */
     public function restore(User $user, Service $service): bool
     {
-        //
+        return true;
     }
 
     /**
@@ -61,6 +62,6 @@ class ServicePolicy
      */
     public function forceDelete(User $user, Service $service): bool
     {
-        //
+        return true;
     }
 }

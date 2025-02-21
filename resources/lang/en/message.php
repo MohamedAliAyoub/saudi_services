@@ -40,6 +40,7 @@ return [
     'visits' => 'Visits',
     'employees' => 'Employees',
     'services' => 'Services',
+    'service' => 'Service',
     'client_requests' => 'Client Requests',
     'done' => 'Done',
     'late' => 'Late',

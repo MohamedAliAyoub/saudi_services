@@ -12,6 +12,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Hash;
@@ -132,33 +133,33 @@ class UserResource extends Resource
     }
 
 
-    public
-    static function getNavigationLabel(): string
+    public static function getNavigationLabel(): string
     {
         return __('message.Users');
     }
 
-    public
-    static function getNavigationBadge(): ?string
+    public static function getNavigationBadge(): ?string
     {
-        return static::getModel()::query()->where('id', auth()->id())->count();
+        return static::getModel()::query()->count();
     }
 
-    public
-    static function getTitle(): string
+    public static function getTitle(): string
     {
         return __('message.User');
     }
 
-    public
-    static function getModelLabel(): string
+    public static function getModelLabel(): string
     {
         return __('message.User');
     }
 
-    public
-    static function getPluralModelLabel(): string
+    public static function getPluralModelLabel(): string
     {
         return __('message.User');
+    }
+
+    public static function getNavigationIcon(): string | Htmlable | null
+    {
+        return 'heroicon-o-user-group';
     }
 }

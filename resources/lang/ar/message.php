@@ -40,6 +40,7 @@ return [
     'visit' => 'الزيارة',
     'employees' => 'الموظفين',
     'services' => 'الخدمات',
+    'service' => 'الخدمة',
     'client_requests' => 'طلبات العملاء',
     'done' => 'تمت الزيارة بنجاح',
     'late' => 'متأخر',
