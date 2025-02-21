@@ -68,8 +68,9 @@ return [
     'APP_NAME' => 'Durable Trust',
     'company_name' => 'Durable Trust Company',
     'company_welcome' => 'Welcome to Durable Trust',
-
-
+    'stores' => 'Stores',
+    'store' => 'Store',
+    'status' => 'Status',
 
 
 ];
