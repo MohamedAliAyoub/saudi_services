@@ -2,6 +2,8 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Resources\AdminResource\Widgets\AdminImageWidget;
+use App\Filament\Resources\AdminResource\Widgets\ClientImageWidget;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -37,8 +39,8 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
-                Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
+                AdminImageWidget::class,
+                ClientImageWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -53,6 +55,6 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-            ]);
+            ])->sidebarCollapsibleOnDesktop();
     }
 }

@@ -50,6 +50,25 @@ return [
     'requests' => 'requests',
     'increase' => 'increase',
     'decrease' => 'decrease',
+    'Image' => 'Image',
+    'Address' => 'Address',
+    'Company_Name' => 'Company Name',
+    'Store_Numbers' => 'Store Numbers',
+    'Name' => 'Name',
+    'Email' => 'Email',
+    'Role' => 'Role',
+    'Password' => 'Password',
+    'Admin' => 'Admin',
+    'Employee' => 'Employee',
+    'Client' => 'Client',
+    'Phone' => 'Phone',
+    'User' => 'User',
+    'Users' => 'Users',
+    'APP_NAME' => 'Durable Trust',
+    'company_name' => 'Durable Trust Company',
+    'company_welcome' => 'Welcome to Durable Trust',
+
+
 
 
 ];

@@ -2,6 +2,8 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Resources\AdminResource\Widgets\AdminImageWidget;
+use App\Filament\Resources\AdminResource\Widgets\ClientImageWidget;
 use App\Filament\Widgets\CustomersChart;
 use App\Filament\Widgets\OrdersChart;
 use App\Filament\Widgets\StatsOverviewWidget;
@@ -57,8 +59,8 @@ class ClientPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Client/Widgets'), for: 'App\\Filament\\Client\\Widgets')
             ->widgets([
-//                Widgets\AccountWidget::class,
-//                Widgets\FilamentInfoWidget::class,
+                AdminImageWidget::class,
+                ClientImageWidget::class,
                 CustomersChart::class,
                 OrdersChart::class,
                 StatsOverviewWidget::class

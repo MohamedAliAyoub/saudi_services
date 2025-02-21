@@ -15,9 +15,9 @@ enum VisitTypeStatus: string implements HasColor, HasIcon, HasLabel
     public function getLabel(): string
     {
         return match ($this) {
-            self::DONE => __("messages.Done_Visits"),
-            self::LATE => __('messages.Late_Visits'),
-            self::PENDING => __('messages.Pending_Visits'),
+            self::DONE => __("message.DONE_VISITS"),
+            self::LATE => __('message.LATE_VISITS'),
+            self::PENDING => __('message.PENDING_VISITS'),
         };
     }
 
@@ -43,4 +43,15 @@ enum VisitTypeStatus: string implements HasColor, HasIcon, HasLabel
     {
         return $this->getLabel();
     }
+
+    public static function asSelectArray(): array
+    {
+        return [
+            self::DONE->value => self::DONE->getLabel(),
+            self::LATE->value => self::LATE->getLabel(),
+            self::PENDING->value => self::PENDING->getLabel(),
+        ];
+    }
+
+
 }

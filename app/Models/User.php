@@ -27,8 +27,11 @@ class User extends Authenticatable
         'address',
         'company_name',
         'store_numbers',
-        'image'
+        'image',
+        'phone',
     ];
+    protected $appends = ['image_url'];
+
 
     /**
      * The attributes that should be hidden for serialization.
@@ -47,13 +50,10 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'password' => 'hashed',
+        'password' => 'hashed'
     ];
 
-    public function getMorphClass()
-    {
-        return $this->type;
-    }
+
 
     public function scopeAdmins($query)
     {
@@ -72,7 +72,10 @@ class User extends Authenticatable
 
     public function getImageUrlAttribute(): string
     {
-        return $this->image ? asset( $this->image) : asset('images/default.png');
+        return $this->image ? asset( 'storage/' . $this->image) : asset('storage/default.png');
     }
+
+
+
 
 }
