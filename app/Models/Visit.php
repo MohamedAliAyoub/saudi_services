@@ -17,6 +17,7 @@ class Visit extends Model
         'service_id',
         'store_id',
         'client_id',
+        'rate',
     ];
     protected $appends = ['translated_status'];
 
