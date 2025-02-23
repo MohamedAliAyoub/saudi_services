@@ -42,19 +42,19 @@ class ClientRequestResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('client.name')
-                    ->label(__('message.CLIENT'))
+                    ->label(__('message.client'))
                     ->sortable(),
                 Tables\Columns\TextColumn::make('service.name')
-                    ->label(__('message.SERVICE'))
+                    ->label(__('message.service'))
                     ->sortable(),
                 Tables\Columns\TextColumn::make('store.name')
-                    ->label(__('message.STORE'))
+                    ->label(__('message.store'))
                     ->sortable(),
                 Tables\Columns\TextColumn::make('status')
-                    ->label(__('message.STATUS'))
+                    ->label(__('message.status'))
                     ->searchable(),
                 Tables\Columns\TextColumn::make('comment')
-                    ->label(__('message.COMMENT'))
+                    ->label(__('message.comment'))
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('message.created_at'))

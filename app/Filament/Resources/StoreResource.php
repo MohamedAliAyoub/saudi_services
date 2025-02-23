@@ -36,7 +36,7 @@ class StoreResource extends Resource
                     ->telRegex('/^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\.\/0-9]*$/')
                     ->nullable(),
                 Forms\Components\Select::make('client_id')
-                    ->label(__('message.Client'))
+                    ->label(__('message.client'))
                     ->relationship('client', 'name')
                     ->required(),
                 Forms\Components\Toggle::make('status')
@@ -59,7 +59,7 @@ class StoreResource extends Resource
                     ->label(__('message.Phone'))
                     ->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('client.name')
-                    ->label(__('message.Client'))
+                    ->label(__('message.client'))
                     ->label('Client')->sortable()->searchable(),
                 Tables\Columns\BooleanColumn::make('status')
                     ->label(__('message.status'))
