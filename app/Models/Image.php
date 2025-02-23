@@ -22,6 +22,6 @@ class Image extends Model
 
     public function getFullPathAttribute()
     {
-        return asset(   $this->path);
+        return asset(   'uploads/images/' . $this->path);
     }
 }

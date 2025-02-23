@@ -16,8 +16,8 @@ enum UserTypeEnum: string implements HasColor, HasIcon, HasLabel
     {
         return match ($this) {
             self::ADMIN => __('message.Admin'),
-            self::CLIENT => __('message.Client'),
-            self::EMPLOYEE => __('message.Employee'),
+            self::CLIENT => __('message.client'),
+            self::EMPLOYEE => __('message.employee'),
         };
     }
 
