@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Enums\VisitTypeStatus;
+use App\Enums\VisitTypeEnum;
 use App\Models\Visit;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Auth;
@@ -21,7 +21,7 @@ class VisitSeeder extends Seeder
                 'store_id' => 1,
                 'date' => now()->subDays(10)->format('Y-m-d'),
                 'time' => now()->subDays(10)->format('H:i:s'),
-                'status' => VisitTypeStatus::PENDING->value,
+                'status' => VisitTypeEnum::PENDING->value,
                 'comment' => 'زيارة قديمة في انتظار',
                 'employee_id' => 1,
                 'service_id' => 1,
@@ -31,7 +31,7 @@ class VisitSeeder extends Seeder
                 'store_id' => 2,
                 'date' => now()->subDays(5)->format('Y-m-d'),
                 'time' => now()->subDays(5)->format('H:i:s'),
-                'status' => VisitTypeStatus::DONE->value,
+                'status' => VisitTypeEnum::DONE->value,
                 'comment' => 'زيارة قديمة مكتملة',
                 'employee_id' => 2,
                 'service_id' => 2,
@@ -41,7 +41,7 @@ class VisitSeeder extends Seeder
                 'store_id' => 3,
                 'date' => now()->addDays(5)->format('Y-m-d'),
                 'time' => now()->addDays(5)->format('H:i:s'),
-                'status' => VisitTypeStatus::LATE->value,
+                'status' => VisitTypeEnum::LATE->value,
                 'comment' => 'زيارة مستقبلية متأخرة',
                 'employee_id' => 3,
                 'service_id' => 3,

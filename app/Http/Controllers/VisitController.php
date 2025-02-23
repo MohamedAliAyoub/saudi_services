@@ -8,6 +8,23 @@ use App\Http\Requests\UpdateVisitRequest;
 
 class VisitController extends Controller
 {
+    public function showRateForm(Visit $visit)
+    {
+        return view('admin.visits.rate', compact('visit'));
+    }
+
+    public function submitRateForm(Request $request, Visit $visit)
+    {
+        $request->validate([
+            'rate' => 'required|integer|min:1|max:5',
+        ]);
+
+        $visit->rate = $request->input('rate');
+        $visit->save();
+
+        return response()->json(['success' => __('message.rate_submitted')]);
+    }
+
     /**
      * Display a listing of the resource.
      */

@@ -2,8 +2,11 @@
 
 namespace App\Models;
 
+use App\Enums\ImagesTypeEnum;
+use App\Enums\VisitTypeEnum;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Visit extends Model
@@ -14,31 +17,25 @@ class Visit extends Model
         'status',
         'comment',
         'employee_id',
-        'service_id',
         'store_id',
         'client_id',
         'rate',
     ];
-    protected $appends = ['translated_status'];
 
     protected $casts = [
         'date' => 'datetime:Y-m-d',
         'time' => 'datetime:H:i:s',
+        'status' => VisitTypeEnum::class,
     ];
-
-    public function getTranslatedStatusAttribute(): \Illuminate\Foundation\Application|array|string|\Illuminate\Contracts\Translation\Translator|\Illuminate\Contracts\Foundation\Application|null
-    {
-        return __('message.' . $this->status);
-    }
 
     public function employee(): BelongsTo
     {
         return $this->belongsTo(Employee::class);
     }
 
-    public function service(): BelongsTo
+    public function services(): BelongsToMany
     {
-        return $this->belongsTo(Service::class);
+        return $this->belongsToMany(Service::class, 'service_visit');
     }
 
     public function store(): BelongsTo
@@ -48,11 +45,32 @@ class Visit extends Model
 
     public function client(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'client_id', 'id');
+        return $this->belongsTo(User::class, 'client_id', 'id')
+            ->where('role', 'client');
     }
 
     public function images(): HasMany
     {
         return $this->hasMany(Image::class);
+    }
+
+    public function imagesBeforeVisits(): HasMany
+    {
+        return $this->images()->where('type', ImagesTypeEnum::BEFORE);
+    }
+
+    public function imagesAfterVisits(): HasMany
+    {
+        return $this->images()->where('type', ImagesTypeEnum::AFTER);
+    }
+
+    public function imagesReportVisits(): HasMany
+    {
+        return $this->images()->where('type', ImagesTypeEnum::REPORTS);
+    }
+
+    public function stores(): BelongsToMany
+    {
+        return $this->belongsToMany(Store::class, 'store_visit');
     }
 }

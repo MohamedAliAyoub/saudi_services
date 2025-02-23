@@ -6,7 +6,7 @@ use Filament\Support\Contracts\HasColor;
 use Filament\Support\Contracts\HasIcon;
 use Filament\Support\Contracts\HasLabel;
 
-enum VisitTypeStatus: string implements HasColor, HasIcon, HasLabel
+enum VisitTypeEnum: string implements HasColor, HasIcon, HasLabel
 {
     case DONE = 'done';
     case LATE = 'late';
@@ -35,7 +35,7 @@ enum VisitTypeStatus: string implements HasColor, HasIcon, HasLabel
         return match ($this) {
             self::DONE => 'heroicon-m-check-circle',
             self::LATE => 'heroicon-m-clock',
-            self::PENDING => 'heroicon-m-hourglass',
+            self::PENDING => 'heroicon-m-clock',
         };
     }
 

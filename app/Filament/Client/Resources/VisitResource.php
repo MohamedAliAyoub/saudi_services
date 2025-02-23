@@ -2,9 +2,10 @@
 
 namespace App\Filament\Client\Resources;
 
-use App\Enums\VisitTypeStatus;
+use App\Enums\VisitTypeEnum;
 use App\Filament\Client\Resources\VisitResource\Pages;
 use App\Filament\Client\Resources\VisitResource\RelationManagers;
+use App\Forms\Components\rateInput;
 use App\Models\Visit;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -13,8 +14,8 @@ use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Contracts\Support\Htmlable;
+use Filament\Forms\Components\Textarea;
 
 class VisitResource extends Resource
 {
@@ -31,33 +32,14 @@ class VisitResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\DatePicker::make('date')
-                    ->label(__('message.DATE'))
-                    ->required(),
-                Forms\Components\TimePicker::make('time')
-                    ->label(__('message.TIME'))
-                    ->required(),
-
-                Forms\Components\BelongsToSelect::make('service_id')
-                    ->label(__('message.SERVICE'))
-                    ->relationship('service', 'name')
-                    ->required(),
-                Forms\Components\BelongsToSelect::make('store_id')
-                    ->label(__('message.STORE'))
-                    ->relationship('store', 'name', fn(Builder $query) => $query->where('client_id', auth()->id()))
-                    ->required(),
-                Forms\Components\BelongsToSelect::make('employee_id')
-                    ->label(__('message.EMPLOYEE'))
-                    ->relationship('employee', 'name'),
-                Forms\Components\Textarea::make('comment')
-                    ->label(__('message.COMMENT'))
+                rateInput::make('rate')
+                    ->label(__('message.rate'))
                     ->nullable(),
-                Forms\Components\Hidden::make('client_id')
-                    ->default(auth()->id())
-                    ->required(),
-                Forms\Components\Hidden::make('status')
-                    ->default("pending")
-                    ->required(),
+                Textarea::make('comment')
+                    ->label(__('message.comment'))
+                    ->minLength(2)
+                    ->maxLength(255)
+                    ->nullable(),
             ]);
     }
 
@@ -66,37 +48,44 @@ class VisitResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('date')
-                    ->label(__('message.DATE'))
+                    ->label(__('message.date'))
                     ->dateTime('Y-m-d'),
                 Tables\Columns\TextColumn::make('time')
-                    ->label(__('message.TIME'))
+                    ->label(__('message.time'))
                     ->dateTime('H:i:s'),
-                Tables\Columns\TextColumn::make('translated_status')
-                    ->label(__('message.STATUS'))
-                    ->searchable()
+                Tables\Columns\TextColumn::make('status')
+                    ->label(__('message.status'))
+                    ->searchable('status')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('comment')
-                    ->label(__('message.COMMENT')),
                 Tables\Columns\TextColumn::make('employee.name')
-                    ->label(__('message.EMPLOYEE'))
+                    ->label(__('message.employee'))
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('service.name')
-                    ->label(__('message.SERVICE'))
+                Tables\Columns\TextColumn::make('services.name')
+                    ->label(__('message.services'))
                     ->searchable()
                     ->sortable(),
+                Tables\Columns\TextColumn::make('rate')
+                    ->label(__('message.rate'))
+                    ->sortable()
+                    ->searchable()
+                    ->view('filament.tables.columns.star-rating-column'),
+                Tables\Columns\TextColumn::make('comment')
+                    ->label(__('message.comment'))
+                    ->limit(40) // Truncate comments longer than 50 characters
+                    ->tooltip(fn($record) => $record->comment), // Show full comment on hover
+
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
-                    ->label(__('message.STATUS'))
-                    ->options([
-                        'pending' => __('message.pending'),
-                        'done' => __('message.done'),
-                        'late' => __('message.late'),
-                    ])
-            ] )
+                    ->label(__('message.status'))
+                    ->options(VisitTypeEnum::asSelectArray()),
+            ])
             ->actions([
+                Tables\Actions\EditAction::make()
+                    ->label(__('message.rate')),
                 Tables\Actions\ViewAction::make(),
+
             ])
             ->bulkActions([
                 // No bulk actions
@@ -125,6 +114,7 @@ class VisitResource extends Resource
         return [
             'index' => Pages\ListVisits::route('/'),
             'view' => Pages\ViewVisit::route('/{record}'),
+//            'edit' => Pages\EditVisit::route('/{record}/edit'),
         ];
     }
 
@@ -151,5 +141,10 @@ class VisitResource extends Resource
     public static function getPluralModelLabel(): string
     {
         return __('message.visit');
+    }
+
+    public static function getNavigationIcon(): string|Htmlable|null
+    {
+        return 'heroicon-o-arrow-right-circle';
     }
 }
