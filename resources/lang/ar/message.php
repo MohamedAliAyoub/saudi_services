@@ -76,9 +76,17 @@ return [
     'report_image' => 'تقرير الزيارة',
     'images' => 'الصور',
     'view' => 'عرض',
-    'not_available'=>'غير متاح',
-    'images_before'=>'صور قبل الزيارة',
-    'images_after'=>'صور بعد الزيارة',
-    'images_reports'=>'صور التقارير',
+    'not_available' => 'غير متاح',
+    'images_before' => 'صور قبل الزيارة',
+    'images_after' => 'صور بعد الزيارة',
+    'images_reports' => 'صور التقارير',
+    'name' => 'الاسم',
+    'logo' => 'الشعار',
+    'date_from' => 'من تاريخ',
+    'date_to' => 'إلى تاريخ',
+    'link' => 'الرابط',
+    'partner' => 'شريك النجاح',
+    'partners' => 'شركاء النجاح',
 
-    ];
+
+];

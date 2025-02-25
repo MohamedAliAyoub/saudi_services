@@ -80,5 +80,13 @@ return [
     'images_before'=>'images before',
     'images_after'=>'images after',
     'images_reports'=>'images reports',
+    'name' => 'Name',
+    'logo' => 'Logo',
+    'date_from' => 'Date From',
+    'date_to' => 'Date To',
+    'link' => 'Link',
+    'partner' => 'Partner success ',
+    'partners' => 'Partners success ',
+
 
 ];

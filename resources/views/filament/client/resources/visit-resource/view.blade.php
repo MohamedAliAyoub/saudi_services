@@ -13,7 +13,7 @@
 
     .image-frame {
         padding: 10px;
-        border: 2px solid #ccc; /* Frame border */
+        /*border: 2px solid #ccc; !* Frame border *!*/
         border-radius: 10px;
         background-color: #fff; /* Frame background color */
     }
@@ -22,6 +22,8 @@
         width: 100%;
         height: auto;
         border-radius: 5px;
+        max-width: 300px; /* Set maximum width */
+        max-height: 300px; /* Set maximum height */
     }
 
     .image-actions {
