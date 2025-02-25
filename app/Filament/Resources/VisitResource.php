@@ -26,47 +26,55 @@ class VisitResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    public static function form(Form $form): Form
-    {
-        return $form
-            ->schema([
-                Forms\Components\DatePicker::make('date')
-                    ->label(__('message.date'))
-                    ->required(),
-                Forms\Components\TimePicker::make('time')
-                    ->label(__('message.time'))
-                    ->required(),
-
-                Forms\Components\Select::make('employee_id')
-                    ->label(__('message.employee'))
-                    ->relationship('employee', 'name')
-                    ->required(),
-                Forms\Components\Select::make('service_id')
-                    ->label(__('message.service'))
-                    ->relationship('services', 'name')
-                    ->options(['' => ''] + \App\Models\Service::pluck('name', 'id')->toArray())
-                    ->multiple()
-                    ->required(),
-                Forms\Components\Select::make('store_id')
-                    ->label(__('message.store'))
-                    ->relationship('store', 'name')
-                    ->required(),
-                Forms\Components\Select::make('client_id')
-                    ->label(__('message.client'))
-                    ->relationship('client', 'name')
-                    ->required(),
-                Forms\Components\Select::make('status')
-                    ->label(__('message.status'))
-                    ->options(\App\Enums\VisitTypeEnum::asSelectArray())
-                    ->default('pending'),
-                Forms\Components\SpatieMediaLibraryFileUpload::make('images_path')
-                    ->multiple()
-                    ->collection('visit_images')
-                    ->directory(fn($record) => 'visits/' . $record->id)
-                    ->label(__('message.images') )
-            ]);
-    }
-
+public static function form(Form $form): Form
+{
+    return $form
+        ->schema([
+            Forms\Components\DatePicker::make('date')
+                ->label(__('message.date'))
+                ->required(),
+            Forms\Components\TimePicker::make('time')
+                ->label(__('message.time'))
+                ->required(),
+            Forms\Components\Select::make('employee_id')
+                ->label(__('message.employee'))
+                ->relationship('employee', 'name')
+                ->required(),
+            Forms\Components\Select::make('service_id')
+                ->label(__('message.service'))
+                ->relationship('services', 'name')
+                ->options(['' => ''] + \App\Models\Service::pluck('name', 'id')->toArray())
+                ->multiple()
+                ->required(),
+            Forms\Components\Select::make('store_id')
+                ->label(__('message.store'))
+                ->relationship('store', 'name')
+                ->required(),
+            Forms\Components\Select::make('client_id')
+                ->label(__('message.client'))
+                ->relationship('client', 'name')
+                ->required(),
+            Forms\Components\Select::make('status')
+                ->label(__('message.status'))
+                ->options(\App\Enums\VisitTypeEnum::asSelectArray())
+                ->default('pending'),
+            Forms\Components\SpatieMediaLibraryFileUpload::make('images_before')
+                ->multiple()
+                ->collection('visit_images_before')
+                ->directory(fn($record) => 'visits/' . $record->id . '/before')
+                ->label(__('message.images_before')),
+            Forms\Components\SpatieMediaLibraryFileUpload::make('images_after')
+                ->multiple()
+                ->collection('visit_images_after')
+                ->directory(fn($record) => 'visits/' . $record->id . '/after')
+                ->label(__('message.images_after')),
+            Forms\Components\SpatieMediaLibraryFileUpload::make('images_reports')
+                ->multiple()
+                ->collection('visit_images_reports')
+                ->directory(fn($record) => 'visits/' . $record->id . '/reports')
+                ->label(__('message.images_reports')),
+        ]);
+}
     public static function table(Table $table): Table
     {
         return $table

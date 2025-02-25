@@ -75,5 +75,10 @@ return [
     'after_image' => 'After Visit',
     'report_image' => 'Report of Visit',
     'images' => 'Images',
+    'view' => 'View',
+    'not_available' => 'Not Available',
+    'images_before'=>'images before',
+    'images_after'=>'images after',
+    'images_reports'=>'images reports',
 
 ];

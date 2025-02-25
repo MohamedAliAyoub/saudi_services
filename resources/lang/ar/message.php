@@ -75,5 +75,10 @@ return [
     'after_image' => 'بعد الزيارة',
     'report_image' => 'تقرير الزيارة',
     'images' => 'الصور',
+    'view' => 'عرض',
+    'not_available'=>'غير متاح',
+    'images_before'=>'صور قبل الزيارة',
+    'images_after'=>'صور بعد الزيارة',
+    'images_reports'=>'صور التقارير',
 
     ];

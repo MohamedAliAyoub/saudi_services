@@ -102,11 +102,30 @@ class Visit extends Model implements HasMedia
         return 'visits/' . $this->id;
     }
 
-    public function getImageUrls(): array
+    public function getImageBeforeUrls(): array
     {
-        return $this->getMedia('visit_images')->map(function (Media $media) {
+        return $this->getMedia('visit_images_before')->map(function (Media $media) {
             return $media->getUrl();
         })->toArray();
     }
+
+    public function getImageAfterUrls(): array
+    {
+        return $this->getMedia('visit_images_after')->map(function (Media $media) {
+            return $media->getUrl();
+        })->toArray();
+    }
+
+
+
+    public function getImageReportUrls(): array
+    {
+        return $this->getMedia('visit_images_reports')->map(function (Media $media) {
+            return $media->getUrl();
+        })->toArray();
+    }
+
+
+
 
 }
