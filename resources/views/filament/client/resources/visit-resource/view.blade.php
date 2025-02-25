@@ -27,12 +27,12 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="image-grid">
-                    @foreach($record->images as $image)
+                    @foreach($record->getImageUrls() as $imageUrl)
                         <div class="image-container">
-                            <img src="{{ asset($image->full_path) }}" alt="Visit Image" class="visit-image">
+                            <img src="{{ $imageUrl }}" alt="Visit Image" class="visit-image">
                             <div class="image-actions">
-                                <a href="{{ asset($image->full_path) }}" download>{{ __('message.Download') }}</a>
-                                <a href="{{ asset($image->full_path) }}" target="_blank">{{ __('message.VIEW') }}</a>
+                                <a href="{{ $imageUrl }}" download>{{ __('message.Download') }}</a>
+                                <a href="{{ $imageUrl }}" target="_blank">{{ __('message.VIEW') }}</a>
                             </div>
                         </div>
                     @endforeach

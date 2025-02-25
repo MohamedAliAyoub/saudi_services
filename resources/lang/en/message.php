@@ -74,5 +74,6 @@ return [
     'before_image' => 'Before Visit',
     'after_image' => 'After Visit',
     'report_image' => 'Report of Visit',
+    'images' => 'Images',
 
 ];

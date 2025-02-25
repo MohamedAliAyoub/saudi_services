@@ -74,5 +74,6 @@ return [
     'before_image' => 'قبل الزيارة',
     'after_image' => 'بعد الزيارة',
     'report_image' => 'تقرير الزيارة',
+    'images' => 'الصور',
 
     ];

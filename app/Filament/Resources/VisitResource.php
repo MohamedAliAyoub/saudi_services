@@ -19,8 +19,6 @@ use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\VisitResource\Columns\StarRatingColumn;
 
 
-
-
 // this is the resource class for the Visit model in Admin
 class VisitResource extends Resource
 {
@@ -61,16 +59,11 @@ class VisitResource extends Resource
                     ->label(__('message.status'))
                     ->options(\App\Enums\VisitTypeEnum::asSelectArray())
                     ->default('pending'),
-                Forms\Components\Textarea::make('comment')
-                    ->label(__('message.comment'))
-                    ->nullable(),
-                Forms\Components\FileUpload::make('images')
-                    ->label(__('message.image'))
+                Forms\Components\SpatieMediaLibraryFileUpload::make('images_path')
                     ->multiple()
-                    ->directory('uploads/images')
-                    ->image()
-                    ->maxSize(1024)
-                    ->required(),
+                    ->collection('visit_images')
+                    ->directory(fn($record) => 'visits/' . $record->id)
+                    ->label(__('message.images') )
             ]);
     }
 
@@ -173,6 +166,7 @@ class VisitResource extends Resource
     {
         return 'heroicon-o-arrow-right-circle';
     }
+
     public static function infolist(Infolist $infolist): Infolist
     {
         return $infolist
