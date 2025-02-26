@@ -18,7 +18,6 @@ return new class extends Migration
             $table->foreignId('client_id')->constrained("users")->onDelete('cascade');
             $table->string('status')->default('pending');
             $table->string('comment')->nullable();
-            $table->foreignId('service_id')->constrained()->onDelete('cascade');
             $table->time('time')->nullable();
             $table->date('date')->nullable();
             $table->unsignedTinyInteger('rate')->nullable();
