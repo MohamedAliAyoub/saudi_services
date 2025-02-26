@@ -14,8 +14,4 @@ class ViewVisit extends ViewRecord
         return 'filament.client.resources.visit-resource.view';
     }
 
-    protected function getTabsView(): string
-    {
-        return 'filament.client.resources.visit-resource.tabs';
-    }
 }
