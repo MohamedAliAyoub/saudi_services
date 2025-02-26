@@ -28,8 +28,7 @@ class PartnerResource extends Resource
                 //
             ]);
     }
-
-  public static function table(Table $table): Table
+public static function table(Table $table): Table
 {
     return $table
         ->columns([
@@ -83,14 +82,13 @@ class PartnerResource extends Resource
                 ->icon('heroicon-m-arrow-top-right-on-square')
                 ->color('gray')
                 ->url(fn (Partner $record): string => '#' . urlencode($record->link)),
-            Tables\Actions\EditAction::make(),
         ])
         ->bulkActions([
             Tables\Actions\BulkActionGroup::make([
             ]),
         ]);
 }
-    public static function getRelations(): array
+public static function getRelations(): array
     {
         return [
             //
@@ -101,8 +99,6 @@ class PartnerResource extends Resource
     {
         return [
             'index' => Pages\ListPartners::route('/'),
-            'create' => Pages\CreatePartner::route('/create'),
-            'edit' => Pages\EditPartner::route('/{record}/edit'),
         ];
     }
 
