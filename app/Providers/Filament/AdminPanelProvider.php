@@ -4,10 +4,12 @@ namespace App\Providers\Filament;
 
 use App\Filament\Resources\AdminResource\Widgets\AdminImageWidget;
 use App\Filament\Resources\AdminResource\Widgets\ClientImageWidget;
+use App\Http\Middleware\LanguageMiddleware;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\UserMenuItem;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -29,6 +31,17 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->userMenuItems([
+                UserMenuItem::make()
+                    ->label(__('English'))
+                    ->url(fn() => route('change-language', ['lang' => 'en']))
+                    ->icon('heroicon-o-language'),
+                UserMenuItem::make()
+
+                    ->label(__('اللغة العربية'))
+                    ->url(fn() => route('change-language', ['lang' => 'ar']))
+                    ->icon('heroicon-o-globe-asia-australia'),
+            ])
             ->colors([
                 'primary' => Color::Amber,
             ])
@@ -52,6 +65,8 @@ class AdminPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
+                LanguageMiddleware::class
+
             ])
             ->authMiddleware([
                 Authenticate::class,
