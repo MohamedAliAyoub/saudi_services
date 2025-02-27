@@ -7,6 +7,11 @@
         margin-bottom: 20px;
     }
 
+    .dark .card {
+        background-color: #2d3748;
+        color: #e2e8f0;
+    }
+
     .card-header {
         font-size: 1.25rem;
         font-weight: bold;
@@ -35,14 +40,18 @@
         border-radius: 10px;
     }
 
-    .image-Title{
+    .image-Title {
         margin-top: 1rem;
         margin-bottom: 1rem;
         padding: 1rem;
         background-color: white;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         border-radius: 10px;
+    }
 
+    .dark .image-Title {
+        background-color: #2d3748;
+        color: #e2e8f0;
     }
 </style>
 <x-filament::page>
