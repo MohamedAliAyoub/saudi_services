@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 class ClientRequest extends Model
 {
     protected $fillable = [
-        'service_id',
         'client_id',
         'store_id',
         'visit_id',
@@ -34,9 +33,9 @@ class ClientRequest extends Model
         });
     }
 
-    public function service()
+    public function services()
     {
-        return $this->belongsTo(Service::class);
+        return $this->belongsToMany(Service::class , 'client_request_services' ,);
     }
 
     public function store()
@@ -49,6 +48,6 @@ class ClientRequest extends Model
     }
     public function client()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class)->where('role', 'client');
     }
 }
