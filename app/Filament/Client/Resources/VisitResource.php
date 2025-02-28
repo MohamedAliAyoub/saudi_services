@@ -16,6 +16,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Filament\Forms\Components\Textarea;
+use Illuminate\Database\Query\Builder;
 
 class VisitResource extends Resource
 {
@@ -146,5 +147,14 @@ class VisitResource extends Resource
     public static function getNavigationIcon(): string|Htmlable|null
     {
         return 'heroicon-o-arrow-right-circle';
+    }
+
+
+// In `app/Filament/Client/Resources/VisitResource.php`
+
+    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    {
+        Visit::updateStatus();
+        return parent::getEloquentQuery()->orderBy('id', 'desc');
     }
 }

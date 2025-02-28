@@ -194,4 +194,10 @@ class VisitResource extends Resource
                     ->columnSpanFull(),
             ]);
     }
+
+    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    {
+        Visit::updateStatus();
+        return parent::getEloquentQuery()->orderBy('id', 'desc');
+    }
 }

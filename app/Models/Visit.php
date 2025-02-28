@@ -8,14 +8,15 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Facades\Log;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Illuminate\Database\Eloquent\Builder;
 
 class Visit extends Model implements HasMedia
 {
     use InteractsWithMedia;
+
     protected $fillable = [
         'date',
         'time',
@@ -117,7 +118,6 @@ class Visit extends Model implements HasMedia
     }
 
 
-
     public function getImageReportUrls(): array
     {
         return $this->getMedia('visit_images_reports')->map(function (Media $media) {
@@ -126,6 +126,12 @@ class Visit extends Model implements HasMedia
     }
 
 
+    public static function updateStatus(): int
+    {
+        return self::where('status', 'pending')
+            ->where('date', '<', now()->toDateString())
+            ->update(['status' => 'late']);
+    }
 
 
 }
