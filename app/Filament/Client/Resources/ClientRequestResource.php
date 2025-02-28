@@ -24,13 +24,18 @@ class ClientRequestResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Select::make('service_id')
-                    ->label(__('SERVICE'))
-                    ->required()
-                    ->relationship('service', 'name'),
+                    ->label(__('message.service'))
+                    ->relationship('services', 'name')
+                    ->options(['' => ''] + \App\Models\Service::pluck('name', 'id')->toArray())
+                    ->multiple()
+                    ->required(),
                 Forms\Components\Select::make('store_id')
                     ->label(__('STORE'))
                     ->required()
-                    ->relationship('store', 'name'),
+                    ->relationship('store', 'name')
+                    ->options(function () {
+                        return \App\Models\Store::where('client_id', auth()->id())->pluck('name', 'id');
+                    }),
                 Forms\Components\TextInput::make('comment')
                     ->label(__('COMMENT'))
                     ->maxLength(255),
@@ -44,18 +49,23 @@ class ClientRequestResource extends Resource
                 Tables\Columns\TextColumn::make('client.name')
                     ->label(__('message.client'))
                     ->sortable(),
-                Tables\Columns\TextColumn::make('service.name')
-                    ->label(__('message.service'))
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('store.name')
                     ->label(__('message.store'))
                     ->sortable(),
                 Tables\Columns\TextColumn::make('status')
                     ->label(__('message.status'))
                     ->searchable(),
+                Tables\Columns\TextColumn::make('services.name')
+                    ->label(__('message.services'))
+                    ->searchable()
+                    ->sortable()
+                    ->limit(30) // Truncate comments longer than 50 characters
+                    ->tooltip(fn($record) => $record->comment), // Show full comment on hover,
                 Tables\Columns\TextColumn::make('comment')
                     ->label(__('message.comment'))
-                    ->searchable(),
+                    ->searchable()
+                    ->limit(40) // Truncate comments longer than 50 characters
+                    ->tooltip(fn($record) => $record->comment),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('message.created_at'))
                     ->dateTime()
@@ -116,6 +126,11 @@ class ClientRequestResource extends Resource
     {
         return __('message.CLIENT_REQUEST');
 
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->orderBy('id' , 'desc');
     }
 
 }
