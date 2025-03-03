@@ -10,6 +10,7 @@ use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Navigation\UserMenuItem;
+use Filament\Notifications\Livewire\DatabaseNotifications;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -70,6 +71,10 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-            ])->sidebarCollapsibleOnDesktop();
+            ])
+            ->databaseNotifications()
+            ->sidebarCollapsibleOnDesktop();
+        DatabaseNotifications::trigger('filament.notifications.database-notifications-trigger');
+
     }
 }

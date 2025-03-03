@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Client extends User
 {
     protected $table = 'users';
-    protected $attributes = ['type' => 'client'];
+    protected $attributes = ['role' => 'client'];
 
 
 }

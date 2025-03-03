@@ -8,5 +8,5 @@ use Illuminate\Database\Eloquent\Model;
 class Admin extends User
 {
     protected $table = 'users';
-    protected $attributes = ['type' => 'admin'];
+    protected $attributes = ['role' => 'admin'];
 }

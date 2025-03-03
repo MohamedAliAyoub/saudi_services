@@ -27,11 +27,11 @@ class StoreResource extends Resource
                     ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('address')
-                    ->label(__('message.Address'))
+                    ->label(__('message.address'))
                     ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('phone')
-                    ->label(__('message.Phone'))
+                    ->label(__('message.phone'))
                     ->tel()
                     ->telRegex('/^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\.\/0-9]*$/')
                     ->nullable(),
@@ -53,10 +53,10 @@ class StoreResource extends Resource
                     ->label(__('message.Name'))
                     ->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('address')
-                    ->label(__('message.Address'))
+                    ->label(__('message.address'))
                     ->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('phone')
-                    ->label(__('message.Phone'))
+                    ->label(__('message.phone'))
                     ->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('client.name')
                     ->label(__('message.client'))
