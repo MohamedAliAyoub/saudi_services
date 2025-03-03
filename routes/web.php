@@ -29,6 +29,4 @@ Route::get('/change-language/{lang}', function ($lang) {
     return redirect()->back();
 })->name('change-language');
 
-Route::get('/admin/visits/{visit}/rate', [VisitController::class, 'showRateForm'])->name('admin.visits.rate');
-Route::post('/admin/visits/{visit}/rate', [VisitController::class, 'submitRateForm'])->name('admin.visits.submitRate');
-//Route::get('/visits/{record}', [\App\Filament\Client\Resources\VisitResource\Pages\ViewVisit::class, 'view'])->name('filament.visit-resource.visits.view');
+

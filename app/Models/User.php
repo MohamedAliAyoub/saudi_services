@@ -29,6 +29,11 @@ class User extends Authenticatable
         'store_numbers',
         'image',
         'phone',
+        'visits_number',
+        'contract_create_date',
+        'contract_end_date',
+        'contract_years_number'
+
     ];
     protected $appends = ['image_url'];
 
@@ -57,17 +62,17 @@ class User extends Authenticatable
 
     public function scopeAdmins($query)
     {
-        return $query->where('type', 'admin');
+        return $query->where('role', 'admin');
     }
 
     public function scopeEmployees($query)
     {
-        return $query->where('type', 'employee');
+        return $query->where('role', 'employee');
     }
 
     public function scopeClients($query)
     {
-        return $query->where('type', 'client');
+        return $query->where('role', 'client');
     }
 
     public function getImageUrlAttribute(): string
@@ -76,6 +81,8 @@ class User extends Authenticatable
     }
 
 
-
-
+    public function stores()
+    {
+        return $this->hasMany(Store::class , 'client_id');
+    }
 }
