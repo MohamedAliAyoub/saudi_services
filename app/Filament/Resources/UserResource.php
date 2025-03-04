@@ -86,7 +86,7 @@ class UserResource extends Resource
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\ImageColumn::make('image_url')
-                    ->label(__('message.Image'))
+                    ->label(__('message.image'))
                     ->disk('public'),
                 Tables\Columns\TextColumn::make('address')
                     ->label(__('message.address'))

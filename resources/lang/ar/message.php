@@ -50,7 +50,7 @@ return [
     'requests' => 'طلبات',
     'increase' => 'زيادة',
     'decrease' => 'انخفاض',
-    'Image' => 'الصورة',
+    'image' => 'الصورة',
     'address' => 'العنوان',
     'Company_Name' => 'اسم الشركة',
     'store_numbers' => 'عدد الافرع',
@@ -66,7 +66,7 @@ return [
     'APP_NAME' => 'شركة الثقة المعمرة للتشغيل و الصيانة',
     'company_name' => 'شركة الثقة المعمرة للتشغيل و الصيانة ',
     'company_welcome' => 'مرحبًا بك في شركة الثقة المعمرة للتشغيل و الصيانة !',
-    'stores' => 'المتاجر',
+    'stores' => 'الافرع',
     'store' => 'المتجر',
     'status' => 'الحالة',
     'rate' => 'التقييم',
@@ -92,7 +92,9 @@ return [
     'contract_end_date' => 'تاريخ انتهاء العقد',
     'contract_years_number' => 'عدد سنوات العقد',
     'visits_number' => 'عدد الزيارات',
+    'client_info' => 'بيانات العميل',
     'password' => 'كلمة المرور',
+    'contract_details' => 'تفاصيل العقد',
 
 
 ];

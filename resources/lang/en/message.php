@@ -49,7 +49,7 @@ return [
     'requests' => 'requests',
     'increase' => 'increase',
     'decrease' => 'decrease',
-    'Image' => 'Image',
+    'image' => 'Image',
     'address' => 'Address',
     'Company_Name' => 'Company Name',
     'store_numbers' => 'Store Numbers',
@@ -92,7 +92,8 @@ return [
     'contract_end_date' => 'Contract End Date',
     'contract_years_number' => 'Contract Years Number',
     'password' => 'Password',
+    'client_info' => 'Client Information',
     'visits_number' => 'Visits Number',
-
+    'contract_details' => 'Contract Details',
 
 ];

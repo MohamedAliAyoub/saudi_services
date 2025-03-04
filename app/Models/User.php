@@ -4,6 +4,8 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -29,11 +31,6 @@ class User extends Authenticatable
         'store_numbers',
         'image',
         'phone',
-        'visits_number',
-        'contract_create_date',
-        'contract_end_date',
-        'contract_years_number'
-
     ];
     protected $appends = ['image_url'];
 
@@ -81,8 +78,19 @@ class User extends Authenticatable
     }
 
 
-    public function stores()
+    public function stores(): HasMany
     {
         return $this->hasMany(Store::class , 'client_id');
+    }
+
+    public function contracts(): HasMany
+    {
+        return $this->hasMany(Contract::class, 'client_id');
+    }
+
+    public function activeContract(): HasOne
+    {
+        return $this->hasOne(Contract::class, 'client_id')
+            ->where('status', 'active');
     }
 }
