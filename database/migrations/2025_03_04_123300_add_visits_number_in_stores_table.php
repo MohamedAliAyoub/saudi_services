@@ -11,11 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
+        Schema::table('stores', function (Blueprint $table) {
             $table->tinyInteger('visits_number')->nullable();
-            $table->date('contract_create_date')->nullable();
-            $table->date('contract_end_date')->nullable();
-            $table->tinyInteger('contract_years_number')->nullable();
         });
     }
 
@@ -24,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            //
+        Schema::table('stores', function (Blueprint $table) {
+            $table->dropColumn('visits_number');
         });
     }
 };

@@ -15,6 +15,7 @@ class Store extends Model
         'address',
         'phone',
         'client_id',
+        'visits_number',
         'status',
     ];
 
