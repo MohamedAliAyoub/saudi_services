@@ -133,5 +133,16 @@ class Visit extends Model implements HasMedia
             ->update(['status' => 'late']);
     }
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($visit) {
+            if (!$visit->client_id && $visit->store) {
+                $visit->client_id = $visit->store->client_id;
+            }
+        });
+    }
+
 
 }

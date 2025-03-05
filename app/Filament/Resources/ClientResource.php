@@ -63,40 +63,48 @@ class ClientResource extends Resource
                     ->columns(3),
                 Forms\Components\Hidden::make('role')
                     ->default('client'),
-                Forms\Components\Section::make('activeContract')
-                    ->label(__('message.contract_details'))
+                Forms\Components\Section::make(__('message.contract_details'))
+                    ->relationship('activeContract')  // ✅ This ensures fields are stored in the Contract model
                     ->schema([
-                        Forms\Components\TextInput::make('activeContract.store_numbers')
+                        Forms\Components\TextInput::make('store_numbers')
                             ->label(__('message.store_numbers'))
                             ->numeric()
                             ->required()
                             ->reactive()
-                            ->afterStateUpdated(fn($state, callable $set) => $set('stores', collect(range(1, (int)$state))->map(fn() => [])->toArray())),
-                        Forms\Components\TextInput::make('activeContract.visits_number')
+                            ->afterStateUpdated(fn($state, callable $set) =>
+                            $set('stores', collect(range(1, (int)$state))->map(fn() => [])->toArray())
+                            ),
+
+                        Forms\Components\TextInput::make('visits_number')
                             ->numeric()
                             ->label(__('message.visits_number'))
                             ->required()
                             ->reactive()
                             ->afterStateUpdated(function ($state, callable $get, callable $set) {
-                                $storeCount = (int)$get('activeContract.store_numbers') ?: 1;
+                                $storeCount = max(1, (int)$get('store_numbers')); // Ensure at least 1 store
                                 $visitsPerStore = $state > 0 ? (int)floor($state / $storeCount) : 0;
 
-                                // تحديث المخازن بالعدد الموزع من الزيارات
-                                $stores = collect(range(1, $storeCount))->map(fn() => ['visits_number' => $visitsPerStore])->toArray();
+                                // Assign visits proportionally to stores
+                                $stores = collect(range(1, $storeCount))
+                                    ->map(fn() => ['visits_number' => $visitsPerStore])
+                                    ->toArray();
+
                                 $set('stores', $stores);
                             }),
-                        Forms\Components\DatePicker::make('activeContract.contract_create_date')
+
+                        Forms\Components\DatePicker::make('contract_create_date')
                             ->label(__('message.contract_create_date'))
                             ->required(),
-                        Forms\Components\DatePicker::make('activeContract.contract_end_date')
+
+                        Forms\Components\DatePicker::make('contract_end_date')
                             ->label(__('message.contract_end_date'))
                             ->required(),
-                        Forms\Components\Hidden::make('activeContract.status')
+
+                        Forms\Components\Hidden::make('status')
                             ->default('active'),
                     ])
                     ->columnSpanFull()
                     ->columns(4),
-
                 Forms\Components\Repeater::make('stores')
                     ->label(__('message.stores'))
                     ->relationship()
@@ -104,25 +112,83 @@ class ClientResource extends Resource
                         Forms\Components\TextInput::make('name')
                             ->label(__('message.name'))
                             ->required(),
+
                         Forms\Components\TextInput::make('address')
                             ->label(__('message.address'))
                             ->required(),
+
                         Forms\Components\TextInput::make('phone')
                             ->label(__('message.phone'))
                             ->required(),
-                        Forms\Components\TextInput::make('visits_number') // Automatically set in afterStateUpdated
-                        ->label(__('message.visits_number'))
+
+                        Forms\Components\TextInput::make('visits_number')
+                            ->label(__('message.visits_number'))
                             ->numeric()
-                            ->required()
-                            ->default(fn($state) => $state['visits_number'] ?? 0),
-                        Forms\Components\Hidden::make('client_id')
-                            ->default(fn($record) => $record?->id),
+                            ->required(),
+
+
+                        //  Visits Repeater (Keep Existing Data When Editing)
+                        Forms\Components\Repeater::make('visits')
+                            ->label(__('message.visits'))
+                            ->relationship('visitsWithClient')
+                            ->schema([
+                                Forms\Components\DatePicker::make('date')
+                                    ->label(__('message.date'))
+                                    ->required(),
+
+                                Forms\Components\TextInput::make('time')
+                                    ->label(__('message.time'))
+                                    ->type('time')
+                                    ->required(),
+
+                                Forms\Components\Select::make('employee_id')
+                                    ->label(__('message.employee'))
+                                    ->relationship('employee', 'name')
+                                    ->nullable(),
+
+                                Forms\Components\Hidden::make('store_id')
+                                    ->default(fn($record) => $record?->id),
+                            ])
+                            ->columnSpanFull()
+                            ->columns(3)
+                            ->reactive()
+                            ->collapsed(false)
+                            ->deletable()
+                            ->default([])
+                            ->hidden(fn(callable $get) => empty($get('visits_number'))),
                     ])
                     ->columnSpanFull()
                     ->columns(4)
-                    ->hidden(fn($get) => empty($get('activeContract.store_numbers'))) // Hide if no stores
                     ->reactive()
-                    ->default([]),
+                    ->default([])
+                    ->collapsed(false)
+                    ->deletable(true)
+                    ->afterStateUpdated(function ($state, callable $get, callable $set) {
+                        $stores = collect($state)->map(function ($store) use ($get) {
+                            $contractStart = $get('activeContract.contract_create_date');
+                            $contractEnd = $get('activeContract.contract_end_date');
+                            $visitsNumber = $store['visits_number'] ?? 0;
+
+                            // ✅ Preserve visits if they already exist
+                            if (!empty($store['visits'])) {
+                                return $store;
+                            }
+
+                            // ✅ Generate new visits only if none exist
+                            if (!empty($contractStart) && !empty($contractEnd) && $visitsNumber > 0) {
+                                $store['visits'] = ClientResource::generateVisitDates(
+                                    $visitsNumber,
+                                    $contractStart,
+                                    $contractEnd
+                                );
+                            }
+
+                            return $store;
+                        });
+
+                        $set('stores', $stores->toArray());
+                    }),
+
             ]);
     }
 
@@ -235,5 +301,23 @@ class ClientResource extends Resource
     {
         return 'heroicon-o-user-group';
     }
+
+    public static function generateVisitDates($visitsNumber, $startDate, $endDate)
+    {
+        $dates = [];
+        $start = \Carbon\Carbon::parse($startDate);
+        $end = \Carbon\Carbon::parse($endDate);
+
+        // ✅ Calculate interval between visits
+        $interval = $end->diffInDays($start) / max(1, ($visitsNumber - 1));
+
+        for ($i = 0; $i < $visitsNumber; $i++) {
+            $visitDate = $start->copy()->addDays($interval * $i)->toDateString();
+            $dates[] = ['date' => $visitDate, 'time' => '09:00'];
+        }
+
+        return $dates;
+    }
+
 
 }
