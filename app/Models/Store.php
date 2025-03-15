@@ -20,6 +20,10 @@ class Store extends Model
         'status',
     ];
 
+    protected $casts = [
+        'name' => 'array',
+    ];
+
     public function client(): BelongsTo
     {
         return $this->belongsTo(User::class, 'client_id')

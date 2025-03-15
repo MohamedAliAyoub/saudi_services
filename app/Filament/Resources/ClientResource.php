@@ -64,7 +64,6 @@ class ClientResource extends Resource
                 Forms\Components\Hidden::make('role')
                     ->default('client'),
                 Forms\Components\Section::make(__('message.contract_details'))
-                    ->relationship('activeContract')  // ✅ This ensures fields are stored in the Contract model
                     ->schema([
                         Forms\Components\TextInput::make('store_numbers')
                             ->label(__('message.store_numbers'))
@@ -81,25 +80,34 @@ class ClientResource extends Resource
                             ->required()
                             ->reactive()
                             ->afterStateUpdated(function ($state, callable $get, callable $set) {
-                                $storeCount = max(1, (int)$get('store_numbers')); // Ensure at least 1 store
+                                $storeCount = max(1, (int)$get('store_numbers'));
                                 $visitsPerStore = $state > 0 ? (int)floor($state / $storeCount) : 0;
 
-                                // Assign visits proportionally to stores
-                                $stores = collect(range(1, $storeCount))
-                                    ->map(fn() => ['visits_number' => $visitsPerStore])
-                                    ->toArray();
+                                // تحديث المتاجر مع بيانات الزيارات
+                                $stores = collect(range(1, $storeCount))->map(function () use ($visitsPerStore, $get) {
+                                    return [
+                                        'visits_number' => $visitsPerStore,
+                                        'visits' => ClientResource::generateVisitDates($visitsPerStore, $get('contract_create_date'), $get('contract_end_date'))
+                                    ];
+                                })->toArray();
 
                                 $set('stores', $stores);
                             }),
-
                         Forms\Components\DatePicker::make('contract_create_date')
                             ->label(__('message.contract_create_date'))
-                            ->required(),
+                            ->prefix('Starts')
+                            ->native(false)
+                            ->required()
+                            ->reactive()
+                            ->afterStateUpdated(fn($state, callable $get, callable $set) => self::updateVisitDates($state, $get, $set)),
 
                         Forms\Components\DatePicker::make('contract_end_date')
                             ->label(__('message.contract_end_date'))
-                            ->required(),
-
+                            ->prefix('ends')
+                            ->native(false)
+                            ->required()
+                            ->reactive()
+                            ->afterStateUpdated(fn($state, callable $get, callable $set) => self::updateVisitDates($state, $get, $set)),
                         Forms\Components\Hidden::make('status')
                             ->default('active'),
                     ])
@@ -190,7 +198,10 @@ class ClientResource extends Resource
                     }),
 
             ]);
+
+
     }
+
 
     public static function table(Table $table): Table
     {
@@ -302,22 +313,65 @@ class ClientResource extends Resource
         return 'heroicon-o-user-group';
     }
 
-    public static function generateVisitDates($visitsNumber, $startDate, $endDate)
+    public static function generateVisitDates($visitsPerStore, $contractStart, $contractEnd)
     {
         $dates = [];
-        $start = \Carbon\Carbon::parse($startDate);
-        $end = \Carbon\Carbon::parse($endDate);
 
-        // ✅ Calculate interval between visits
-        $interval = $end->diffInDays($start) / max(1, ($visitsNumber - 1));
+        if ($visitsPerStore <= 0 || !$contractStart instanceof \Carbon\Carbon || !$contractEnd instanceof \Carbon\Carbon) {
+            return $dates;
+        }
 
-        for ($i = 0; $i < $visitsNumber; $i++) {
-            $visitDate = $start->copy()->addDays($interval * $i)->toDateString();
+        // Calculate the interval safely
+        $totalDays = $contractEnd->diffInDays($contractStart);
+        $interval = max(1, ($totalDays > 0) ? floor($totalDays / max(1, $visitsPerStore - 1)) : 1);
+
+        for ($i = 0; $i < $visitsPerStore; $i++) {
+            $visitDate = $contractStart->copy()->addDays($interval * $i)->format('Y-m-d');
             $dates[] = ['date' => $visitDate, 'time' => '09:00'];
         }
 
         return $dates;
     }
 
+    protected static function updateVisitDates($state, callable $get, callable $set)
+    {
+        $contractStart = $get('contract_create_date');
+        $contractEnd = $get('contract_end_date');
+        $storeNumbers = (int) $get('store_numbers');
+        $visitsNumber = (int) $get('visits_number');
+        $stores = $get('stores');
+
+        // Ensure valid values
+        if ($storeNumbers <= 0 || $visitsNumber <= 0 || empty($contractStart) || empty($contractEnd)) {
+            return;
+        }
+
+        try {
+            // Convert to Carbon instances
+            $contractStart = \Carbon\Carbon::parse($contractStart);
+            $contractEnd = \Carbon\Carbon::parse($contractEnd);
+        } catch (\Exception $e) {
+            return; // Prevent errors if date conversion fails
+        }
+
+        // Calculate visits per store as an integer
+        $visitsPerStore = (int) floor($visitsNumber / $storeNumbers);
+
+        // Ensure contractStart and contractEnd are valid dates
+        if (!$contractStart instanceof \Carbon\Carbon || !$contractEnd instanceof \Carbon\Carbon) {
+            return;
+        }
+
+        // Generate stores with visits
+        $updatedStores = collect(range(1, $storeNumbers))->map(function ($index) use ($visitsPerStore, $contractStart, $contractEnd) {
+            return [
+                'name' => "Store {$index}",
+                'visits_number' => $visitsPerStore,
+                'visits' => ClientResource::generateVisitDates($visitsPerStore, $contractStart, $contractEnd)
+            ];
+        });
+
+        $set('stores', $updatedStores->toArray());
+    }
 
 }

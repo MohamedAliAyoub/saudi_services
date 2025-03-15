@@ -57,7 +57,6 @@ class User extends Authenticatable
     ];
 
 
-
     public function scopeAdmins($query)
     {
         return $query->where('role', 'admin');
@@ -75,13 +74,13 @@ class User extends Authenticatable
 
     public function getImageUrlAttribute(): string
     {
-        return $this->image ? asset( 'storage/' . $this->image) : asset('storage/default.png');
+        return $this->image ? asset('storage/' . $this->image) : asset('storage/default.png');
     }
 
 
     public function stores(): HasMany
     {
-        return $this->hasMany(Store::class , 'client_id');
+        return $this->hasMany(Store::class, 'client_id');
     }
 
     public function contracts(): HasMany
@@ -94,4 +93,27 @@ class User extends Authenticatable
         return $this->hasOne(Contract::class, 'client_id');
     }
 
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($user) {
+            $user->handleActiveContract();
+        });
+
+        static::updating(function ($user) {
+            $user->handleActiveContract();
+        });
+    }
+
+    public function visits(): HasMany
+    {
+        return $this->hasMany(Visit::class, 'client_id');
+    }
+
+    public function  visitsWithClient(): HasMany
+    {
+        return $this->hasMany(Visit::class , 'client_id')->with('client');
+    }
 }
