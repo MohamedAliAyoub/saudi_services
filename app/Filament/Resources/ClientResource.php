@@ -70,28 +70,17 @@ class ClientResource extends Resource
                             ->numeric()
                             ->required()
                             ->reactive()
-                            ->afterStateUpdated(fn($state, callable $set) =>
-                            $set('stores', collect(range(1, (int)$state))->map(fn() => [])->toArray())
-                            ),
+                            ->afterStateUpdated(function ($state, callable $get, callable $set) {
+                                ClientResource::updateVisitDates($state, $get, $set);
+                            }),
 
                         Forms\Components\TextInput::make('visits_number')
-                            ->numeric()
                             ->label(__('message.visits_number'))
+                            ->numeric()
                             ->required()
                             ->reactive()
                             ->afterStateUpdated(function ($state, callable $get, callable $set) {
-                                $storeCount = max(1, (int)$get('store_numbers'));
-                                $visitsPerStore = $state > 0 ? (int)floor($state / $storeCount) : 0;
-
-                                // تحديث المتاجر مع بيانات الزيارات
-                                $stores = collect(range(1, $storeCount))->map(function () use ($visitsPerStore, $get) {
-                                    return [
-                                        'visits_number' => $visitsPerStore,
-                                        'visits' => ClientResource::generateVisitDates($visitsPerStore, $get('contract_create_date'), $get('contract_end_date'))
-                                    ];
-                                })->toArray();
-
-                                $set('stores', $stores);
+                                ClientResource::updateVisitDates($state, $get, $set);
                             }),
                         Forms\Components\DatePicker::make('contract_create_date')
                             ->label(__('message.contract_create_date'))
@@ -335,11 +324,10 @@ class ClientResource extends Resource
 
     protected static function updateVisitDates($state, callable $get, callable $set)
     {
-        $contractStart = $get('contract_create_date');
-        $contractEnd = $get('contract_end_date');
         $storeNumbers = (int) $get('store_numbers');
         $visitsNumber = (int) $get('visits_number');
-        $stores = $get('stores');
+        $contractStart = $get('contract_create_date');
+        $contractEnd = $get('contract_end_date');
 
         // Ensure valid values
         if ($storeNumbers <= 0 || $visitsNumber <= 0 || empty($contractStart) || empty($contractEnd)) {
@@ -354,23 +342,21 @@ class ClientResource extends Resource
             return; // Prevent errors if date conversion fails
         }
 
-        // Calculate visits per store as an integer
-        $visitsPerStore = (int) floor($visitsNumber / $storeNumbers);
+        // Calculate base visits per store and distribute extra visits
+        $baseVisitsPerStore = (int) floor($visitsNumber / $storeNumbers);
+        $extraVisits = $visitsNumber % $storeNumbers; // The remaining visits to distribute
 
-        // Ensure contractStart and contractEnd are valid dates
-        if (!$contractStart instanceof \Carbon\Carbon || !$contractEnd instanceof \Carbon\Carbon) {
-            return;
-        }
-
-        // Generate stores with visits
-        $updatedStores = collect(range(1, $storeNumbers))->map(function ($index) use ($visitsPerStore, $contractStart, $contractEnd) {
+        // Generate updated stores
+        $updatedStores = collect(range(1, $storeNumbers))->map(function ($index) use ($baseVisitsPerStore, $extraVisits, $contractStart, $contractEnd) {
+            $visitsForThisStore = $baseVisitsPerStore + ($index <= $extraVisits ? 1 : 0); // Distribute remainder
             return [
                 'name' => "Store {$index}",
-                'visits_number' => $visitsPerStore,
-                'visits' => ClientResource::generateVisitDates($visitsPerStore, $contractStart, $contractEnd)
+                'visits_number' => $visitsForThisStore,
+                'visits' => ClientResource::generateVisitDates($visitsForThisStore, $contractStart, $contractEnd)
             ];
         });
 
+        // Update stores state
         $set('stores', $updatedStores->toArray());
     }
 
