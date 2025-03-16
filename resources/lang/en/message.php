@@ -95,5 +95,7 @@ return [
     'client_info' => 'Client Information',
     'visits_number' => 'Visits Number',
     'contract_details' => 'Contract Details',
+    'start_date' => 'Start Date',
+    'end_date' => 'End Date',
 
 ];

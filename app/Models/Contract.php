@@ -10,7 +10,14 @@ class Contract extends Model
 {
     use HasFactory;
 
-    protected $guarded = [];
+    protected $fillable = [
+        'store_numbers',
+        'visits_number',
+        'contract_create_date',
+        'contract_end_date',
+        'client_id',
+        'status',
+    ];
 
     public function client(): BelongsTo
     {
