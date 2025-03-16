@@ -88,32 +88,19 @@ class User extends Authenticatable
         return $this->hasMany(Contract::class, 'client_id');
     }
 
-    public function activeContract(): HasOne
+    public function contract(): HasOne
     {
         return $this->hasOne(Contract::class, 'client_id');
     }
 
-
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::creating(function ($user) {
-            $user->handleActiveContract();
-        });
-
-        static::updating(function ($user) {
-            $user->handleActiveContract();
-        });
-    }
 
     public function visits(): HasMany
     {
         return $this->hasMany(Visit::class, 'client_id');
     }
 
-    public function  visitsWithClient(): HasMany
+    public function visitsWithClient(): HasMany
     {
-        return $this->hasMany(Visit::class , 'client_id')->with('client');
+        return $this->hasMany(Visit::class, 'client_id')->with('client');
     }
 }

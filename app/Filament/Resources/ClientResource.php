@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Components\ContractDetailsComponent;
 use App\Filament\Resources\ClientResource\Pages;
 use App\Filament\Resources\ClientResource\RelationManagers;
 use App\Models\Client;
@@ -15,6 +16,7 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class ClientResource extends Resource
 {
@@ -63,48 +65,10 @@ class ClientResource extends Resource
                     ->columns(3),
                 Forms\Components\Hidden::make('role')
                     ->default('client'),
-                Forms\Components\Section::make(__('message.contract_details'))
-                    ->schema([
-                        Forms\Components\TextInput::make('store_numbers')
-                            ->label(__('message.store_numbers'))
-                            ->numeric()
-                            ->required()
-                            ->reactive()
-                            ->afterStateUpdated(function ($state, callable $get, callable $set) {
-                                ClientResource::updateVisitDates($state, $get, $set);
-                            }),
-
-                        Forms\Components\TextInput::make('visits_number')
-                            ->label(__('message.visits_number'))
-                            ->numeric()
-                            ->required()
-                            ->reactive()
-                            ->afterStateUpdated(function ($state, callable $get, callable $set) {
-                                ClientResource::updateVisitDates($state, $get, $set);
-                            }),
-                        Forms\Components\DatePicker::make('contract_create_date')
-                            ->label(__('message.contract_create_date'))
-                            ->prefix('Starts')
-                            ->native(false)
-                            ->required()
-                            ->reactive()
-                            ->afterStateUpdated(fn($state, callable $get, callable $set) => self::updateVisitDates($state, $get, $set)),
-
-                        Forms\Components\DatePicker::make('contract_end_date')
-                            ->label(__('message.contract_end_date'))
-                            ->prefix('ends')
-                            ->native(false)
-                            ->required()
-                            ->reactive()
-                            ->afterStateUpdated(fn($state, callable $get, callable $set) => self::updateVisitDates($state, $get, $set)),
-                        Forms\Components\Hidden::make('status')
-                            ->default('active'),
-                    ])
-                    ->columnSpanFull()
-                    ->columns(4),
+                ContractDetailsComponent::make(),
                 Forms\Components\Repeater::make('stores')
                     ->label(__('message.stores'))
-                    ->relationship()
+                    ->relationship('stores')
                     ->schema([
                         Forms\Components\TextInput::make('name')
                             ->label(__('message.name'))
@@ -123,8 +87,6 @@ class ClientResource extends Resource
                             ->numeric()
                             ->required(),
 
-
-                        //  Visits Repeater (Keep Existing Data When Editing)
                         Forms\Components\Repeater::make('visits')
                             ->label(__('message.visits'))
                             ->relationship('visitsWithClient')
@@ -161,18 +123,30 @@ class ClientResource extends Resource
                     ->collapsed(false)
                     ->deletable(true)
                     ->afterStateUpdated(function ($state, callable $get, callable $set) {
-                        $stores = collect($state)->map(function ($store) use ($get) {
-                            $contractStart = $get('activeContract.contract_create_date');
-                            $contractEnd = $get('activeContract.contract_end_date');
-                            $visitsNumber = $store['visits_number'] ?? 0;
+                        Log::info('Stores in Create:', $state); // Debugging
+                        $set('stores', $state ?? []);
 
-                            // ✅ Preserve visits if they already exist
+                        $stores = collect($state ?? [])->map(function ($store) use ($get) {
+                            $contractStart = $get('contract_create_date');
+                            $contractEnd = $get('contract_end_date');
+                            $visitsNumber = (int) ($store['visits_number'] ?? 0);
+
+                            if (empty($contractStart) || empty($contractEnd)) {
+                                return $store;
+                            }
+
+                            try {
+                                $contractStart = \Carbon\Carbon::parse($contractStart);
+                                $contractEnd = \Carbon\Carbon::parse($contractEnd);
+                            } catch (\Exception $e) {
+                                return $store;
+                            }
+
                             if (!empty($store['visits'])) {
                                 return $store;
                             }
 
-                            // ✅ Generate new visits only if none exist
-                            if (!empty($contractStart) && !empty($contractEnd) && $visitsNumber > 0) {
+                            if ($visitsNumber > 0) {
                                 $store['visits'] = ClientResource::generateVisitDates(
                                     $visitsNumber,
                                     $contractStart,
@@ -183,9 +157,10 @@ class ClientResource extends Resource
                             return $store;
                         });
 
-                        $set('stores', $stores->toArray());
-                    }),
+                        Log::info('Stores After:', $stores->toArray()); // Debug log
 
+                        $set('stores', $stores->toArray());
+                    })
             ]);
 
 
@@ -268,7 +243,7 @@ class ClientResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->where('role', 'client');
+        return parent::getEloquentQuery()->where('role', 'client', 'stores', 'visits');
     }
 
 
@@ -322,42 +297,11 @@ class ClientResource extends Resource
         return $dates;
     }
 
-    protected static function updateVisitDates($state, callable $get, callable $set)
+
+    public static function mutateFormDataBeforeCreate(array $data): array
     {
-        $storeNumbers = (int) $get('store_numbers');
-        $visitsNumber = (int) $get('visits_number');
-        $contractStart = $get('contract_create_date');
-        $contractEnd = $get('contract_end_date');
-
-        // Ensure valid values
-        if ($storeNumbers <= 0 || $visitsNumber <= 0 || empty($contractStart) || empty($contractEnd)) {
-            return;
-        }
-
-        try {
-            // Convert to Carbon instances
-            $contractStart = \Carbon\Carbon::parse($contractStart);
-            $contractEnd = \Carbon\Carbon::parse($contractEnd);
-        } catch (\Exception $e) {
-            return; // Prevent errors if date conversion fails
-        }
-
-        // Calculate base visits per store and distribute extra visits
-        $baseVisitsPerStore = (int) floor($visitsNumber / $storeNumbers);
-        $extraVisits = $visitsNumber % $storeNumbers; // The remaining visits to distribute
-
-        // Generate updated stores
-        $updatedStores = collect(range(1, $storeNumbers))->map(function ($index) use ($baseVisitsPerStore, $extraVisits, $contractStart, $contractEnd) {
-            $visitsForThisStore = $baseVisitsPerStore + ($index <= $extraVisits ? 1 : 0); // Distribute remainder
-            return [
-                'name' => "Store {$index}",
-                'visits_number' => $visitsForThisStore,
-                'visits' => ClientResource::generateVisitDates($visitsForThisStore, $contractStart, $contractEnd)
-            ];
-        });
-
-        // Update stores state
-        $set('stores', $updatedStores->toArray());
+        Log::info('Form Data:', $data); // This logs the data before saving
+        return $data;
     }
 
 }
