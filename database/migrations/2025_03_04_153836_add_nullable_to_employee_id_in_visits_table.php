@@ -13,9 +13,11 @@ return new class extends Migration
     {
         Schema::table('visits', function (Blueprint $table) {
             //drop the foreign key
+            if ($table->hasColumn('employee_id')){
             $table->dropForeign(['employee_id']);
-            //drop the column
             $table->dropColumn('employee_id');
+        }
+        if (!$table->hasColumn('employee_id'))
             $table->foreignId('employee_id')->nullable()->constrained("users")->onDelete('cascade');
         });
     }
