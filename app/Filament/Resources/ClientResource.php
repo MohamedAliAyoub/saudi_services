@@ -243,7 +243,7 @@ class ClientResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->where('role', 'client', 'stores', 'visits');
+        return parent::getEloquentQuery()->where('role', 'client');
     }
 
 

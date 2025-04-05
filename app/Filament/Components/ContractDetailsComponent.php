@@ -15,7 +15,7 @@ class ContractDetailsComponent
     public static function make(): Section
     {
         return Section::make(__('message.contract_details'))
-            ->relationship('contract')
+//            ->relationship('contract')
             ->schema([
                 TextInput::make('store_numbers')
                     ->label(__('message.store_numbers'))
