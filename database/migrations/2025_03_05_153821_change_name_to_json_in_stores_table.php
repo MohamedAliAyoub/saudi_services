@@ -14,8 +14,9 @@ return new class extends Migration
         Schema::table('stores', function (Blueprint $table) {
             if (Schema::hasColumn('stores', 'name')) {
                 $table->dropColumn('name');
+            }elseif (!Schema::hasColumn('stores', 'name')) {
+                $table->string('name')->nullable();
             }
-            $table->json('name')->nullable();
         });
     }
 
