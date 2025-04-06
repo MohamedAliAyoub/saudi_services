@@ -26,6 +26,8 @@ class Visit extends Model implements HasMedia
         'store_id',
         'client_id',
         'rate',
+        'is_emergency',
+        'emergency_comment',
     ];
 
     protected $casts = [
@@ -79,6 +81,11 @@ class Visit extends Model implements HasMedia
     public function stores(): BelongsToMany
     {
         return $this->belongsToMany(Store::class, 'store_visit');
+    }
+
+    public function statusLogs(): HasMany
+    {
+        return $this->hasMany(VisitStatusLog::class);
     }
 
     public function registerMediaCollections(): void
