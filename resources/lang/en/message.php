@@ -29,6 +29,7 @@ return [
     'date' => 'Date',
     'VIEW' => 'View',
     'CLIENTS' => 'Clients',
+    'clients' => 'Clients',
     'CLIENT_REQUESTS' => 'Client Requests',
     'CLIENT_REQUEST' => 'Client Request',
     'CLIENT_REQUESTS_LIST' => 'Client Requests List',

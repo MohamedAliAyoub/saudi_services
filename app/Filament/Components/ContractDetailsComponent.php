@@ -30,6 +30,12 @@ class ContractDetailsComponent
                     ->required()
                     ->reactive()
                     ->afterStateUpdated(fn($state, callable $get, callable $set) => self::updateVisitDates($get, $set)),
+                Forms\Components\Select::make('service_id')
+                    ->label(__('message.service'))
+                    ->relationship('services', 'name')
+                    ->options(['' => ''] + \App\Models\Service::pluck('name', 'id')->toArray())
+                    ->multiple()
+                    ->required(),
 
                 DatePicker::make('contract_create_date')
                     ->label(__('message.contract_create_date'))
@@ -52,7 +58,7 @@ class ContractDetailsComponent
                     ->default('active'),
             ])
             ->columnSpanFull()
-            ->columns(4);
+            ->columns(5);
     }
 
   protected static function updateVisitDates(callable $get, callable $set)

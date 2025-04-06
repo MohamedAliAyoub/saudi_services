@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class ClientRequest extends Model
 {
@@ -33,20 +35,20 @@ class ClientRequest extends Model
         });
     }
 
-    public function services()
+    public function services(): BelongsToMany
     {
         return $this->belongsToMany(Service::class , 'client_request_services' ,);
     }
 
-    public function store()
+    public function store(): BelongsTo
     {
         return $this->belongsTo(Store::class);
     }
-    public function visit()
+    public function visit(): BelongsTo
     {
         return $this->belongsTo(Visit::class);
     }
-    public function client()
+    public function client(): BelongsTo
     {
         return $this->belongsTo(User::class)->where('role', 'client');
     }

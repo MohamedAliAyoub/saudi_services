@@ -97,6 +97,7 @@ return [
     'contract_details' => 'تفاصيل العقد',
     'start_date' => 'تاريخ البدء',
     'end_date' => 'تاريخ الانتهاء',
+    'clients' => 'العملاء'
 
 
 ];

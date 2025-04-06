@@ -249,7 +249,7 @@ class ClientResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        return __('message.client');
+        return __('message.clients');
     }
 
     public static function getNavigationBadge(): ?string
@@ -269,7 +269,7 @@ class ClientResource extends Resource
 
     public static function getPluralModelLabel(): string
     {
-        return __('message.client');
+        return __('message.clients');
     }
 
     public static function getNavigationIcon(): string|Htmlable|null
