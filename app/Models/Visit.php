@@ -39,7 +39,8 @@ class Visit extends Model implements HasMedia
 
     public function employee(): BelongsTo
     {
-        return $this->belongsTo(Employee::class);
+        return $this->belongsTo(User::class , 'employee_id')
+            ->where('role', 'employee');
     }
 
     public function services(): BelongsToMany
@@ -145,6 +146,12 @@ class Visit extends Model implements HasMedia
         parent::boot();
 
         static::creating(function ($visit) {
+            if(!is_null($visit->store_id)){
+                $store = Store::find($visit->store_id);
+                if ($store) {
+                    $visit->client_id = $store->client_id;
+                }
+            }
             if (!$visit->client_id && $visit->store) {
                 $visit->client_id = $visit->store->client_id;
             }

@@ -16,4 +16,10 @@ class EditClient extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
+
+    protected function mutateFormDataBeforeFill(array $data): array
+    {
+        $this->record->load(['activeContract', 'activeContract.stores', 'activeContract.stores.visits']);
+        return parent::mutateFormDataBeforeFill($data);
+    }
 }

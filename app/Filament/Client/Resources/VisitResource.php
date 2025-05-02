@@ -4,7 +4,6 @@ namespace App\Filament\Client\Resources;
 
 use App\Enums\VisitTypeEnum;
 use App\Filament\Client\Resources\VisitResource\Pages;
-use App\Filament\Client\Resources\VisitResource\RelationManagers;
 use App\Forms\Components\rateInput;
 use App\Models\Visit;
 use Filament\Forms;
@@ -16,7 +15,9 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Filament\Forms\Components\Textarea;
-use Illuminate\Database\Query\Builder;
+use App\Models\Service;
+use App\Models\Store;
+use Illuminate\Database\Eloquent\Builder;
 
 class VisitResource extends Resource
 {
@@ -26,22 +27,50 @@ class VisitResource extends Resource
 
     public static function canCreate(): bool
     {
-        return false;
+        return true;
     }
 
     public static function form(Form $form): Form
     {
+        if ($form->getRecord() && $form->getRecord()->exists) {
+            return $form
+                ->schema([
+                    rateInput::make('rate')
+                        ->label(__('message.rate'))
+                        ->nullable(),
+                    Textarea::make('comment')
+                        ->label(__('message.comment'))
+                        ->minLength(2)
+                        ->maxLength(255)
+                        ->nullable(),
+                ]);
+        }
         return $form
             ->schema([
-                rateInput::make('rate')
-                    ->label(__('message.rate'))
-                    ->nullable(),
-                Textarea::make('comment')
-                    ->label(__('message.comment'))
-                    ->minLength(2)
-                    ->maxLength(255)
-                    ->nullable(),
+                Forms\Components\Select::make('service_id')
+                    ->label(__('message.services'))
+                    ->relationship('services', 'name')
+                    ->options(['' => ''] + Service::query()->pluck('name', 'id')->toArray())
+                    ->multiple()
+                    ->required(),
+                Forms\Components\Select::make('store_id')
+                    ->label(__('message.store'))
+                    ->options(function (callable $get) {
+                        return Store::query()->where('client_id', auth()->id())->pluck('address', 'id')->toArray();
+                    })
+                    ->required(),
+                Forms\Components\TextInput::make('emergency_comment')
+                    ->label(__('message.emergency_visit_comment')),
+                Forms\Components\DatePicker::make('date')
+                    ->label(__('message.date')),
+                Forms\Components\TimePicker::make('time')
+                    ->label(__('message.time')),
+                Forms\Components\Hidden::make('status')
+                    ->default(VisitTypeEnum::EMERGENCY),
+                Forms\Components\Hidden::make('is_emergency')
+                    ->default(1),
             ]);
+
     }
 
     public static function table(Table $table): Table
@@ -73,6 +102,11 @@ class VisitResource extends Resource
                     ->view('filament.tables.columns.star-rating-column'),
                 Tables\Columns\TextColumn::make('comment')
                     ->label(__('message.comment'))
+                    ->limit(40) // Truncate comments longer than 50 characters
+                    ->tooltip(fn($record) => $record->comment), // Show full comment on hover
+
+                Tables\Columns\TextColumn::make('emergency_comment')
+                    ->label(__('message.emergency_visit_comment'))
                     ->limit(40) // Truncate comments longer than 50 characters
                     ->tooltip(fn($record) => $record->comment), // Show full comment on hover
 
@@ -150,11 +184,11 @@ class VisitResource extends Resource
     }
 
 
-// In `app/Filament/Client/Resources/VisitResource.php`
-
-    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    public static function getEloquentQuery(): Builder
     {
         Visit::updateStatus();
-        return parent::getEloquentQuery()->orderBy('id', 'desc');
+        return parent::getEloquentQuery()
+            ->orderByRaw("status = ? DESC", [VisitTypeEnum::EMERGENCY->value])
+            ->orderBy('id', 'desc');
     }
 }

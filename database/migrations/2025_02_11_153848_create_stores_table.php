@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('address');
             $table->string('phone')->nullable();
-            $table->foreignId('client_id')->constrained("users")->onDelete('cascade');
+            $table->foreignId('client_id')->nullable()->constrained("users")->onDelete('cascade');
             $table->tinyInteger('visits_number')->nullable();
             $table->boolean('status')->default(1);
             $table->timestamps();

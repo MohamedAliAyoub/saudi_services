@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('store_id')->constrained()->onDelete('cascade');
             $table->foreignId('employee_id')->constrained("users")->onDelete('cascade');
-            $table->foreignId('client_id')->constrained("users")->onDelete('cascade');
+            $table->foreignId('client_id')->nullable()->constrained("users")->onDelete('cascade');
             $table->string('status')->default('pending');
             $table->string('comment')->nullable();
             $table->time('time')->nullable();

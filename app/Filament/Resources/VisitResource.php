@@ -5,8 +5,9 @@ namespace App\Filament\Resources;
 use App\Enums\VisitTypeEnum;
 use App\Filament\Client\Resources\VisitResource\Pages\ViewVisit;
 use App\Filament\Resources\VisitResource\Pages;
+use App\Models\Service;
+use App\Models\Store;
 use App\Models\Visit;
-use Filament\Actions\Action;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\ImageEntry;
@@ -15,8 +16,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
-use Illuminate\Database\Eloquent\Builder;
-use App\Filament\Resources\VisitResource\Columns\StarRatingColumn;
+
 
 
 // this is the resource class for the Visit model in Admin
@@ -43,8 +43,7 @@ class VisitResource extends Resource
                 Forms\Components\Select::make('service_id')
                     ->label(__('message.service'))
                     ->relationship('services', 'name')
-                    ->options(['' => ''] + \App\Models\Service::pluck('name', 'id')->toArray())
-                    ->multiple()
+                    ->options(['' => ''] + Service::query()->pluck('name', 'id')->toArray())
                     ->required(),
                 Forms\Components\Select::make('client_id')
                     ->label(__('message.client'))
@@ -58,14 +57,14 @@ class VisitResource extends Resource
                     ->options(function (callable $get) {
                         $clientId = $get('client_id');
                         if ($clientId) {
-                            return \App\Models\Store::where('client_id', $clientId)->pluck('name', 'id')->toArray();
+                            return Store::query()->where('client_id', $clientId)->pluck('name', 'id')->toArray();
                         }
                         return [];
                     })
                     ->required(),
                 Forms\Components\Select::make('status')
                     ->label(__('message.status'))
-                    ->options(\App\Enums\VisitTypeEnum::asSelectArray())
+                    ->options(VisitTypeEnum::asSelectArray())
                     ->default('pending'),
                 Forms\Components\SpatieMediaLibraryFileUpload::make('images_before')
                     ->multiple()
@@ -198,6 +197,8 @@ class VisitResource extends Resource
     public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
     {
         Visit::updateStatus();
-        return parent::getEloquentQuery()->orderBy('id', 'desc');
+        return parent::getEloquentQuery()
+            ->orderByRaw("status = ? DESC", [VisitTypeEnum::EMERGENCY->value])
+            ->orderBy('id', 'desc');
     }
 }

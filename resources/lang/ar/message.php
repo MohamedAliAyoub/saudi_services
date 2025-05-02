@@ -97,7 +97,19 @@ return [
     'contract_details' => 'تفاصيل العقد',
     'start_date' => 'تاريخ البدء',
     'end_date' => 'تاريخ الانتهاء',
-    'clients' => 'العملاء'
-
+    'clients' => 'العملاء',
+    'add_emergency_visit' => 'إضافة زيارة طارئة',
+    'emergency_visit' => 'زيارة طارئة',
+    'emergency_visits' => 'الزيارات الطارئة',
+    'emergency_visit_comment' => 'سبب الزيارة الطارئة',
+    'name_ar' => 'الاسم بالعربية',
+    'name_en' => 'الاسم بالانجليزية',
+    'contracts' => 'العقود',
+    'contract' => 'العقد',
+    'contract_date_validation_error' => 'خطأ في تواريخ العقد',
+    'contract_date_overlap' => 'تداخل في تواريخ العقود',
+    'activate_contract' => 'تفعيل العقد',
+    'active_contract_exists' => 'يوجد عقد نشط',
+    'cannot_activate_contract' => 'هذا العميل لديه بالفعل عقد نشط. يمكن أن يكون عقد واحد فقط نشطًا في وقت واحد.',
 
 ];

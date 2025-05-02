@@ -2,27 +2,37 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Components\ContractDetailsComponent;
 use App\Filament\Resources\ClientResource\Pages;
 use App\Filament\Resources\ClientResource\RelationManagers;
 use App\Models\Client;
-use App\Models\User;
 use Filament\Forms;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Resources\Concerns\Translatable;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\DB;
+
+// Correct import
+
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
 
 class ClientResource extends Resource
 {
+    use Translatable;
+
     protected static ?string $model = Client::class;
 
+
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+
 
     public static function form(Form $form): Form
     {
@@ -30,9 +40,10 @@ class ClientResource extends Resource
             ->schema([
                 Forms\Components\Section::make(__('message.client_info'))
                     ->schema([
-                        Forms\Components\TextInput::make('name')
-                            ->required()
-                            ->label(__('message.name')),
+                        Forms\Components\TextInput::make('name.ar')
+                            ->label(__('message.name'))
+                            ->required(),
+
                         Forms\Components\TextInput::make('email')
                             ->label(__('message.email'))
                             ->required()
@@ -65,102 +76,118 @@ class ClientResource extends Resource
                     ->columns(3),
                 Forms\Components\Hidden::make('role')
                     ->default('client'),
-                ContractDetailsComponent::make(),
-                Forms\Components\Repeater::make('stores')
-                    ->label(__('message.stores'))
-                    ->relationship('stores')
+                Section::make(__('message.contract_details'))
+                    ->relationship('activeContract')
                     ->schema([
-                        Forms\Components\TextInput::make('name')
-                            ->label(__('message.name'))
-                            ->required(),
-
-                        Forms\Components\TextInput::make('address')
-                            ->label(__('message.address'))
-                            ->required(),
-
-                        Forms\Components\TextInput::make('phone')
-                            ->label(__('message.phone'))
-                            ->required(),
-
-                        Forms\Components\TextInput::make('visits_number')
-                            ->label(__('message.visits_number'))
-                            ->numeric()
-                            ->required(),
-
-                        Forms\Components\Repeater::make('visits')
-                            ->label(__('message.visits'))
-                            ->relationship('visitsWithClient')
+                        Grid::make(5)
                             ->schema([
-                                Forms\Components\DatePicker::make('date')
-                                    ->label(__('message.date'))
+                                TextInput::make('store_numbers')
+                                    ->label(__('message.store_numbers'))
+                                    ->numeric()
+                                    ->required()
+                                    ->reactive()
+                                    ->afterStateUpdated(function ($state, callable $get, callable $set) {
+                                        self::updateStores($state, $get, $set);
+                                    }),
+                                Forms\Components\Hidden::make('status')
+                                    ->default('active')
+                                    ->visible(fn ($livewire) => $livewire instanceof Pages\CreateClient),
+
+                                TextInput::make('visits_number')
+                                    ->label(__('message.visits_number'))
+                                    ->numeric()
+                                    ->required()
+                                    ->reactive()
+                                    ->afterStateUpdated(function ($state, callable $get, callable $set) {
+                                        self::updateStores(null, $get, $set);
+                                    }),
+
+                                Select::make('service_id')
+                                    ->label(__('message.service'))
+                                    ->relationship('services')
+                                    ->options(\App\Models\Service::pluck('name', 'id')->toArray())
+                                    ->multiple()
                                     ->required(),
 
-                                Forms\Components\TextInput::make('time')
-                                    ->label(__('message.time'))
-                                    ->type('time')
-                                    ->required(),
 
-                                Forms\Components\Select::make('employee_id')
-                                    ->label(__('message.employee'))
-                                    ->relationship('employee', 'name')
-                                    ->nullable(),
+                                DatePicker::make('contract_create_date')
+                                    ->label(__('message.contract_create_date'))
+                                    ->required()
+                                    ->reactive()
+                                    ->afterStateUpdated(function ($state, callable $get, callable $set) {
+                                        self::updateStores(null, $get, $set);
+                                    }),
 
-                                Forms\Components\Hidden::make('store_id')
-                                    ->default(fn($record) => $record?->id),
+                                DatePicker::make('contract_end_date')
+                                    ->label(__('message.contract_end_date'))
+                                    ->required()
+                                    ->reactive()
+                                    ->minDate(fn(callable $get) => $get('contract_create_date'))
+                                    ->afterStateUpdated(function ($state, callable $get, callable $set) {
+                                        self::updateStores(null, $get, $set);
+                                    }),
+                            ]),
+
+                        Forms\Components\Repeater::make('stores')
+                            ->label(__('message.stores'))
+                            ->relationship('stores')
+                            ->schema([
+                                Grid::make(4)
+                                    ->schema([
+                                        TextInput::make('name.en')
+                                            ->label(__('message.name_en'))
+                                            ->required(),
+
+                                        TextInput::make('name.ar')
+                                            ->label(__('message.name_ar'))
+                                            ->required(),
+                                        TextInput::make('address')
+                                            ->label(__('message.address'))
+                                            ->required(),
+
+                                        TextInput::make('phone')
+                                            ->label(__('message.phone'))
+                                            ->required(),
+                                    ]),
+
+                                Section::make(__('message.visits'))
+                                    ->schema([
+                                        Forms\Components\Repeater::make('visits')
+                                            ->label(false)
+                                            ->relationship('visits')
+                                            ->schema([
+                                                Grid::make(3)
+                                                    ->schema([
+                                                        Forms\Components\Hidden::make('client_id')
+                                                            ->default(function ($get, $record, $livewire) {
+                                                                if (request()->route('record')) {
+                                                                    return request()->route('record');
+                                                                }
+                                                                return null;
+                                                            }),
+                                                        DatePicker::make('date')
+                                                            ->label(__('message.date'))
+                                                            ->required(),
+
+                                                        TextInput::make('time')
+                                                            ->label(__('message.time'))
+                                                            ->type('time')
+                                                            ->required(),
+
+                                                        Select::make('employee_id')
+                                                            ->label(__('message.employee'))
+                                                            ->options(\App\Models\Employee::pluck('name', 'id')->toArray())
+                                                            ->nullable(),
+                                                    ]),
+                                            ])
+                                            ->columns(1),
+                                    ])
+                                    ->collapsible(),
                             ])
-                            ->columnSpanFull()
-                            ->columns(3)
-                            ->reactive()
-                            ->collapsed(false)
-                            ->deletable()
-                            ->default([])
-                            ->hidden(fn(callable $get) => empty($get('visits_number'))),
+                            ->columns(1),
                     ])
-                    ->columnSpanFull()
-                    ->columns(4)
-                    ->reactive()
-                    ->default([])
-                    ->collapsed(false)
-                    ->deletable(true)
-                    ->afterStateUpdated(function ($state, callable $get, callable $set) {
-                        Log::info('Stores in Create:', $state); // Debugging
-                        $set('stores', $state ?? []);
+                    ->columns(1)
 
-                        $stores = collect($state ?? [])->map(function ($store) use ($get) {
-                            $contractStart = $get('contract_create_date');
-                            $contractEnd = $get('contract_end_date');
-                            $visitsNumber = (int) ($store['visits_number'] ?? 0);
-
-                            if (empty($contractStart) || empty($contractEnd)) {
-                                return $store;
-                            }
-
-                            try {
-                                $contractStart = \Carbon\Carbon::parse($contractStart);
-                                $contractEnd = \Carbon\Carbon::parse($contractEnd);
-                            } catch (\Exception $e) {
-                                return $store;
-                            }
-
-                            if (!empty($store['visits'])) {
-                                return $store;
-                            }
-
-                            if ($visitsNumber > 0) {
-                                $store['visits'] = ClientResource::generateVisitDates(
-                                    $visitsNumber,
-                                    $contractStart,
-                                    $contractEnd
-                                );
-                            }
-
-                            return $store;
-                        });
-
-                        Log::info('Stores After:', $stores->toArray()); // Debug log
-
-                        $set('stores', $stores->toArray());
-                    })
             ]);
 
 
@@ -171,14 +198,11 @@ class ClientResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')
+                Tables\Columns\TextColumn::make('name_ar')
                     ->label(__('message.name'))
-                    ->sortable()
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('email')
-                    ->label(__('message.email'))
-                    ->sortable()
-                    ->searchable(),
+                    ->getStateUsing(fn($record) => $record->name ?? null),
+
+
                 Tables\Columns\TextColumn::make('phone')
                     ->label(__('message.phone'))
                     ->sortable()
@@ -188,27 +212,23 @@ class ClientResource extends Resource
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('company_name')
-                    ->label(__('message.company_name'))
+                    ->label(__('message.company_title'))
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('store_numbers')
+                Tables\Columns\TextColumn::make('activeContract.store_numbers')
                     ->label(__('message.store_numbers'))
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('visits_number')
+                Tables\Columns\TextColumn::make('activeContract.visits_number')
                     ->label(__('message.visits_number'))
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('contract_create_date')
+                Tables\Columns\TextColumn::make('activeContract.contract_create_date')
                     ->label(__('message.contract_create_date'))
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('contract_end_date')
+                Tables\Columns\TextColumn::make('activeContract.contract_end_date')
                     ->label(__('message.contract_end_date'))
-                    ->sortable()
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('contract_years_number')
-                    ->label(__('message.contract_years_number'))
                     ->sortable()
                     ->searchable(),
             ])
@@ -217,6 +237,11 @@ class ClientResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('contracts')
+                    ->label(__('message.contracts'))
+                    ->icon('heroicon-o-document-text')
+                    ->url(fn ($record) => route('filament.admin.resources.contracts.index', ['client_id' => $record->id]))
+                    ->openUrlInNewTab(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -225,10 +250,52 @@ class ClientResource extends Resource
             ]);
     }
 
+
+    protected static function updateStores($state, callable $get, callable $set)
+    {
+        $storeNumbers = (int)$get('store_numbers');
+        $visitsNumber = (int)$get('visits_number');
+        $contractStart = $get('contract_create_date');
+        $contractEnd = $get('contract_end_date');
+
+        if ($storeNumbers <= 0 || $visitsNumber <= 0 || empty($contractStart) || empty($contractEnd)) {
+            \Log::warning('[Update Stores in Contract] Missing or invalid input values');
+            return;
+        }
+
+        try {
+            $contractStart = \Carbon\Carbon::parse($contractStart);
+            $contractEnd = \Carbon\Carbon::parse($contractEnd);
+        } catch (\Exception $e) {
+            \Log::error('[Update Stores in Contract] Error parsing contract dates', ['error' => $e->getMessage()]);
+            return;
+        }
+
+        $baseVisitsPerStore = (int)floor($visitsNumber / $storeNumbers);
+        $extraVisits = $visitsNumber % $storeNumbers;
+
+        $stores = collect(range(1, $storeNumbers))->map(function ($index) use ($baseVisitsPerStore, $extraVisits, $contractStart, $contractEnd) {
+            $visitsForThisStore = $baseVisitsPerStore + ($index <= $extraVisits ? 1 : 0);
+            $visits = ClientResource::generateVisitDates($visitsForThisStore, $contractStart, $contractEnd);
+
+            return [
+                'name_ar' => '',
+                'name_en' => '',
+                'address' => '',
+                'phone' => '',
+                'visits' => $visits,
+            ];
+        });
+
+        $set('stores', $stores->toArray());
+    }
+
     public static function getRelations(): array
     {
         return [
-            //
+//            'App\Filament\Resources\ClientResource\RelationManagers\StoresRelationManager',
+//            'App\Filament\Resources\ClientResource\RelationManagers\VisitsRelationManager',
+//            'App\Filament\Resources\ClientResource\RelationManagers\ContractsRelationManager',
         ];
     }
 
@@ -241,11 +308,23 @@ class ClientResource extends Resource
         ];
     }
 
+
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->where('role', 'client');
-    }
+        // Log all executed queries
+        DB::listen(function ($query) {
+            \Log::info('Executed Query', [
+                'sql' => $query->sql,
+                'bindings' => $query->bindings,
+                'time' => $query->time,
+            ]);
+        });
 
+        return parent::getEloquentQuery()
+            ->where('role', 'client')
+            ->with(['activeContract.stores.visits'])
+            ->orderBy('id', 'desc');
+    }
 
     public static function getNavigationLabel(): string
     {
@@ -279,13 +358,23 @@ class ClientResource extends Resource
 
     public static function generateVisitDates($visitsPerStore, $contractStart, $contractEnd)
     {
+        \Log::info('[Generate Visits Dates in Client Resource] generateVisitDates called', [
+            'visitsPerStore' => $visitsPerStore,
+            'contractStart' => $contractStart,
+            'contractEnd' => $contractEnd,
+        ]);
+
         $dates = [];
 
         if ($visitsPerStore <= 0 || !$contractStart instanceof \Carbon\Carbon || !$contractEnd instanceof \Carbon\Carbon) {
+            \Log::warning('[Generate Visits Dates in Client Resource] Invalid input parameters for generateVisitDates', [
+                'visitsPerStore' => $visitsPerStore,
+                'contractStart' => $contractStart,
+                'contractEnd' => $contractEnd,
+            ]);
             return $dates;
         }
 
-        // Calculate the interval safely
         $totalDays = $contractEnd->diffInDays($contractStart);
         $interval = max(1, ($totalDays > 0) ? floor($totalDays / max(1, $visitsPerStore - 1)) : 1);
 
@@ -294,14 +383,10 @@ class ClientResource extends Resource
             $dates[] = ['date' => $visitDate, 'time' => '09:00'];
         }
 
+        \Log::info('[Generate Visits Dates in Client Resource] Generated visit dates', ['dates' => $dates]);
+
         return $dates;
     }
 
-
-    public static function mutateFormDataBeforeCreate(array $data): array
-    {
-        Log::info('Form Data:', $data); // This logs the data before saving
-        return $data;
-    }
 
 }

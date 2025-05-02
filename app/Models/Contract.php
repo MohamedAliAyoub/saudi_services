@@ -12,6 +12,7 @@ class Contract extends Model
 {
     use HasFactory;
 
+    protected $with = ['services'];
     protected $fillable = [
         'store_numbers',
         'visits_number',
@@ -29,5 +30,11 @@ class Contract extends Model
     public function services(): BelongsToMany
     {
         return $this->belongsToMany(Service::class, 'contract_visits');
+    }
+
+
+    public function stores(): HasMany
+    {
+        return $this->hasMany(Store::class);
     }
 }

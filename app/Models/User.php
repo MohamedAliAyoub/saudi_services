@@ -103,4 +103,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(Visit::class, 'client_id')->with('client');
     }
+
+
+    public function activeContract(): HasOne
+    {
+        return $this->hasOne(Contract::class, 'client_id')->orderBy('id', 'desc')->where('status', 'active');
+    }
 }

@@ -13,7 +13,7 @@ class ContractPolicy
      */
     public function viewAny(User $user): bool
     {
-        //
+        return true;
     }
 
     /**
@@ -21,7 +21,7 @@ class ContractPolicy
      */
     public function view(User $user, Contract $contract): bool
     {
-        //
+        return true;
     }
 
     /**
@@ -29,7 +29,8 @@ class ContractPolicy
      */
     public function create(User $user): bool
     {
-        //
+        return true;
+
     }
 
     /**
@@ -37,7 +38,7 @@ class ContractPolicy
      */
     public function update(User $user, Contract $contract): bool
     {
-        //
+        return true;
     }
 
     /**
@@ -45,7 +46,7 @@ class ContractPolicy
      */
     public function delete(User $user, Contract $contract): bool
     {
-        //
+        return true;
     }
 
     /**
@@ -53,7 +54,7 @@ class ContractPolicy
      */
     public function restore(User $user, Contract $contract): bool
     {
-        //
+        return true;
     }
 
     /**
@@ -61,6 +62,6 @@ class ContractPolicy
      */
     public function forceDelete(User $user, Contract $contract): bool
     {
-        //
+        return true;
     }
 }
