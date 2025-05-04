@@ -111,5 +111,5 @@ return [
     'activate_contract' => 'تفعيل العقد',
     'active_contract_exists' => 'يوجد عقد نشط',
     'cannot_activate_contract' => 'هذا العميل لديه بالفعل عقد نشط. يمكن أن يكون عقد واحد فقط نشطًا في وقت واحد.',
-
+    'copy_contract' => 'نسخ العقد',
 ];

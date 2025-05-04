@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ContractResource\Pages;
+use App\Filament\Resources\ContractResource\Traits\HasClientBreadcrumbs;
 use App\Models\Contract;
 use App\Models\Service;
 use Filament\Forms;
@@ -79,12 +80,12 @@ class ContractResource extends Resource
                                                     ->first();
 
                                                 if ($existingContract) {
-                                                   Notification::make('active-contract-exists')
-                                                            ->danger()
-                                                            ->title(__('message.active_contract_exists'))
-                                                            ->body(__('message.cannot_activate_contract'))
-                                                            ->persistent()
-                                                            ->send();
+                                                    Notification::make('active-contract-exists')
+                                                        ->danger()
+                                                        ->title(__('message.active_contract_exists'))
+                                                        ->body(__('message.cannot_activate_contract'))
+                                                        ->persistent()
+                                                        ->send();
 
                                                     // Force toggle back to inactive
                                                     $set('status', false);
@@ -178,44 +179,6 @@ class ContractResource extends Resource
             ]);
     }
 
-    protected static function updateStores($state, callable $get, callable $set)
-    {
-        $storeNumbers = (int)$get('store_numbers');
-        $visitsNumber = (int)$get('visits_number');
-        $contractStart = $get('contract_create_date');
-        $contractEnd = $get('contract_end_date');
-
-        if ($storeNumbers <= 0 || $visitsNumber <= 0 || empty($contractStart) || empty($contractEnd)) {
-            \Log::warning('[Update Stores in Contract] Missing or invalid input values');
-            return;
-        }
-
-        try {
-            $contractStart = \Carbon\Carbon::parse($contractStart);
-            $contractEnd = \Carbon\Carbon::parse($contractEnd);
-        } catch (\Exception $e) {
-            \Log::error('[Update Stores in Contract] Error parsing contract dates', ['error' => $e->getMessage()]);
-            return;
-        }
-
-        $baseVisitsPerStore = (int)floor($visitsNumber / $storeNumbers);
-        $extraVisits = $visitsNumber % $storeNumbers;
-
-        $stores = collect(range(1, $storeNumbers))->map(function ($index) use ($baseVisitsPerStore, $extraVisits, $contractStart, $contractEnd) {
-            $visitsForThisStore = $baseVisitsPerStore + ($index <= $extraVisits ? 1 : 0);
-            $visits = self::generateVisitDates($visitsForThisStore, $contractStart, $contractEnd);
-
-            return [
-                'name_ar' => '',
-                'name_en' => '',
-                'address' => '',
-                'phone' => '',
-                'visits' => $visits,
-            ];
-        });
-
-        $set('stores', $stores->toArray());
-    }
 
     protected static function validateContractDates(?string $startDate, ?string $endDate, ?int $clientId, callable $set): void
     {
@@ -295,19 +258,27 @@ class ContractResource extends Resource
                     ->date()
                     ->sortable(),
 
-               Tables\Columns\IconColumn::make('status')
-                        ->label(__('message.status'))
-                        ->boolean()
-                        ->trueIcon('heroicon-o-check-circle')
-                        ->falseIcon('heroicon-o-x-circle')
-                        ->trueColor('success')
-                        ->falseColor('danger'),
+                Tables\Columns\IconColumn::make('status')
+                    ->label(__('message.status'))
+                    ->boolean()
+                    ->trueIcon('heroicon-o-check-circle')
+                    ->falseIcon('heroicon-o-x-circle')
+                    ->trueColor('success')
+                    ->falseColor('danger'),
             ])
             ->filters([
                 //
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('copy')
+                    ->label(__('message.copy_contract'))
+                    ->icon('heroicon-o-document-duplicate')
+                    ->url(fn($record) => route('filament.admin.resources.contracts.copy', [
+                        'sourceContract' => $record->id,
+                        'client_id' => request()->query('client_id')
+                    ])
+                    ),
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
@@ -329,6 +300,7 @@ class ContractResource extends Resource
         return [
             'index' => Pages\ListContracts::route('/'),
             'create' => Pages\CreateContract::route('/create'),
+            'copy' => Pages\CopyContract::route('/copy/{sourceContract}'),
             'edit' => Pages\EditContract::route('/{record}/edit'),
         ];
     }
@@ -366,4 +338,123 @@ class ContractResource extends Resource
     {
         return false;
     }
+
+    protected function getBreadcrumbs()
+    {
+        //
+    }
+
+
+    protected static function updateStores($state, callable $get, callable $set)
+    {
+        $storeNumbers = (int)$get('store_numbers');
+        $visitsNumber = (int)$get('visits_number');
+        $contractStart = $get('contract_create_date');
+        $contractEnd = $get('contract_end_date');
+
+        if ($storeNumbers <= 0 || $visitsNumber <= 0 || empty($contractStart) || empty($contractEnd)) {
+            \Log::warning('[Update Stores in Contract] Missing or invalid input values');
+            return;
+        }
+
+        try {
+            $contractStart = \Carbon\Carbon::parse($contractStart);
+            $contractEnd = \Carbon\Carbon::parse($contractEnd);
+        } catch (\Exception $e) {
+            \Log::error('[Update Stores in Contract] Error parsing contract dates', ['error' => $e->getMessage()]);
+            return;
+        }
+
+        // Retrieve stores from the session
+        $currentStores = session('copied_stores', []);
+        \Log::info('[Update Stores in Contract] Session Data:', ['copied_stores' => $currentStores]);
+
+        if (!empty($currentStores)) {
+            $baseVisitsPerStore = (int)floor($visitsNumber / $storeNumbers);
+            $extraVisits = $visitsNumber % $storeNumbers;
+
+            foreach ($currentStores as $index => &$store) {
+                $visitsForThisStore = $baseVisitsPerStore + ($index < $extraVisits ? 1 : 0);
+                $visitDates = self::generateVisitDates($visitsForThisStore, $contractStart, $contractEnd);
+
+                // Preserve name and update visits
+                $store['visits'] = $visitDates;
+                $store['name'] = [
+                    'ar' => $store['name']['ar'] ?? '',
+                    'en' => $store['name']['en'] ?? '',
+                ];
+            }
+
+            // Log updated stores
+            \Log::info('[Update Stores in Contract] Updated Stores:', ['stores' => $currentStores]);
+
+            // Update the form state
+            $set('stores', $currentStores);
+        }
+    }
+
+    protected static function isCopyingContract(): bool
+    {
+        $currentUrl = request()->url();
+        return str_contains($currentUrl, '/contracts/copy/');
+    }
+
+    // تخزين بيانات المتاجر في الجلسة عند النسخ
+    public function mount(int $sourceContract = null): void
+    {
+        abort_unless($sourceContract, 404);
+
+        parent::mount();
+
+        $contract = Contract::with([
+            'stores.visits',
+            'services'
+        ])->findOrFail($sourceContract);
+
+        // إعداد بيانات المتاجر
+        $stores = $contract->stores->map(function ($store) {
+            return [
+                'name' => [
+                    'ar' => $store->name['ar'] ?? '',
+                    'en' => $store->name['en'] ?? '',
+                ],
+                'address' => $store->address,
+                'phone' => $store->phone,
+                'visits' => $store->visits->map(function ($visit) {
+                    return [
+                        'date' => $visit->date,
+                        'time' => $visit->time,
+                        'employee_id' => $visit->employee_id,
+                        'client_id' => $visit->client_id,
+                    ];
+                })->toArray(),
+            ];
+        })->toArray();
+
+        session(['copied_stores' => $stores]); // تخزين البيانات في الجلسة
+
+        // تعبئة الفورم
+        $formData = [
+            'client_id' => $contract->client_id,
+            'store_numbers' => $contract->store_numbers,
+            'visits_number' => $contract->visits_number,
+            'status' => false,
+            'service_id' => $contract->services->pluck('id')->toArray(),
+            'stores' => $stores,
+        ];
+
+        $this->form->fill($formData);
+        $this->data = $formData;
+        \Log::info('[Session Data]', ['copied_stores' => session('copied_stores')]);
+    }
+
+    // حذف بيانات الجلسة عند الحفظ
+    public function create(bool $another = false): void
+    {
+        parent::create($another);
+
+        // حذف بيانات المتاجر من الجلسة بعد الحفظ
+        session()->forget('copied_stores');
+    }
+
 }

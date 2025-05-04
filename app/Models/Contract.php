@@ -37,4 +37,6 @@ class Contract extends Model
     {
         return $this->hasMany(Store::class);
     }
+
+
 }

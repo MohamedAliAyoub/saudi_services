@@ -111,4 +111,6 @@ return [
     'activate_contract' => 'Activate Contract',
     'active_contract_exists' => 'Active Contract Exists',
     'cannot_activate_contract' => 'This client already has an active contract. Only one contract can be active at a time.',
+    'copy_contract' => 'Copy Contract',
+
 ];
