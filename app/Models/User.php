@@ -3,6 +3,8 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
@@ -11,7 +13,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable
+class User extends Authenticatable implements FilamentUser
 {
     use HasApiTokens, HasFactory, Notifiable;
 
@@ -109,4 +111,28 @@ class User extends Authenticatable
     {
         return $this->hasOne(Contract::class, 'client_id')->orderBy('id', 'desc')->where('status', 'active');
     }
+
+    public function storesWithActiveContracts(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            Contract::class,
+            Store::class,
+            'contract_id',
+            'id',
+            'contract_id',
+            'id'
+        )->where('contracts.status', 'active');
+    }
+
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        if ($panel->getId() === 'admin') {
+            return $this->role === 'admin';
+        }
+
+        return true;
+
+    }
+
 }

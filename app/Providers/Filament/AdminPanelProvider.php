@@ -68,12 +68,9 @@ class AdminPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
-                LanguageMiddleware::class
+                LanguageMiddleware::class,
+            ])
 
-            ])
-            ->authMiddleware([
-                Authenticate::class,
-            ])
             ->databaseNotifications()
             ->sidebarCollapsibleOnDesktop()
             ->plugin(SpatieLaravelTranslatablePlugin::make()
