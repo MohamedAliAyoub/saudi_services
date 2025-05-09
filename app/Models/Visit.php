@@ -155,6 +155,30 @@ class Visit extends Model implements HasMedia
             if (!$visit->client_id && $visit->store) {
                 $visit->client_id = $visit->store->client_id;
             }
+
+            if ($visit->is_emergency) {
+                $visit->status = VisitTypeEnum::EMERGENCY;
+            } else {
+                $visit->status = VisitTypeEnum::PENDING;
+            }
+
+        });
+        static::created(function ($visit) {
+            VisitStatusLog::query()->create([
+                'visit_id' => $visit->id,
+                'status' => $visit->status,
+                'user_id' => auth()->id(),
+            ]);
+        });
+
+        static::updating(function ($visit) {
+            if ($visit->isDirty('status')) {
+                VisitStatusLog::query()->create([
+                    'visit_id' => $visit->id,
+                    'status' => $visit->status,
+                    'client_id' => auth()->id(),
+                ]);
+            }
         });
     }
 

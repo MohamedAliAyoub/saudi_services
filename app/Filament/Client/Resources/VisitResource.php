@@ -56,7 +56,9 @@ class VisitResource extends Resource
                 Forms\Components\Select::make('store_id')
                     ->label(__('message.store'))
                     ->options(function (callable $get) {
-                        return Store::query()->where('client_id', auth()->id())->pluck('address', 'id')->toArray();
+                        $client = \App\Models\Client::find(auth()->id());
+
+                        return $client?->storesWithActiveContracts()->pluck('stores.address', 'stores.id')->toArray() ?? [];
                     })
                     ->required(),
                 Forms\Components\TextInput::make('emergency_comment')
