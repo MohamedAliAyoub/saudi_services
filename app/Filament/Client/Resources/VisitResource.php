@@ -5,11 +5,13 @@ namespace App\Filament\Client\Resources;
 use App\Enums\VisitTypeEnum;
 use App\Filament\Client\Resources\VisitResource\Pages;
 use App\Forms\Components\rateInput;
+use App\Models\Client;
 use App\Models\Visit;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Infolist;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -18,6 +20,7 @@ use Filament\Forms\Components\Textarea;
 use App\Models\Service;
 use App\Models\Store;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
 class VisitResource extends Resource
 {
@@ -56,21 +59,23 @@ class VisitResource extends Resource
                 Forms\Components\Select::make('store_id')
                     ->label(__('message.store'))
                     ->options(function (callable $get) {
-                        $client = \App\Models\Client::find(auth()->id());
-
-                        return $client?->storesWithActiveContracts()->pluck('stores.address', 'stores.id')->toArray() ?? [];
+                        return auth()->user()?->storesWithActiveContracts()->pluck('stores.address', 'stores.id')->toArray() ?? [];
                     })
                     ->required(),
                 Forms\Components\TextInput::make('emergency_comment')
                     ->label(__('message.emergency_visit_comment')),
                 Forms\Components\DatePicker::make('date')
-                    ->label(__('message.date')),
+                    ->label(__('message.date'))
+                    ->required(),
+
                 Forms\Components\TimePicker::make('time')
-                    ->label(__('message.time')),
+                    ->label(__('message.time'))
+                    ->required(),
                 Forms\Components\Hidden::make('status')
                     ->default(VisitTypeEnum::EMERGENCY),
                 Forms\Components\Hidden::make('is_emergency')
                     ->default(1),
+
             ]);
 
     }
@@ -85,9 +90,17 @@ class VisitResource extends Resource
                 Tables\Columns\TextColumn::make('time')
                     ->label(__('message.time'))
                     ->dateTime('H:i:s'),
+                Tables\Columns\TextColumn::make('store.address')
+                    ->label(__('message.store'))
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('status')
                     ->label(__('message.status'))
                     ->searchable('status')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('client.name')
+                    ->label(__('message.client'))
+                    ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('employee.name')
                     ->label(__('message.employee'))
@@ -129,6 +142,7 @@ class VisitResource extends Resource
             ]);
     }
 
+
     public static function infolist(Infolist $infolist): Infolist
     {
         return $infolist
@@ -150,6 +164,7 @@ class VisitResource extends Resource
     {
         return [
             'index' => Pages\ListVisits::route('/'),
+            'create' => Pages\CreateVisit::route('/create'),
             'view' => Pages\ViewVisit::route('/{record}'),
 //            'edit' => Pages\EditVisit::route('/{record}/edit'),
         ];

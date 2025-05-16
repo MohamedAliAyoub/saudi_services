@@ -43,12 +43,10 @@ class ClientPanelProvider extends PanelProvider
                     ->url(fn() => route('change-language', ['lang' => 'en']))
                     ->icon('heroicon-o-language'),
                 UserMenuItem::make()
-
                     ->label(__('اللغة العربية'))
                     ->url(fn() => route('change-language', ['lang' => 'ar']))
                     ->icon('heroicon-o-globe-asia-australia'),
             ])
-
             ->colors([
                 'primary' => Color::Amber,
             ])
@@ -95,9 +93,7 @@ class ClientPanelProvider extends PanelProvider
             ->databaseNotifications()
             ->sidebarCollapsibleOnDesktop();
 
-        DatabaseNotifications::trigger('filament.notifications.database-notifications-trigger');
     }
-
 
 
 

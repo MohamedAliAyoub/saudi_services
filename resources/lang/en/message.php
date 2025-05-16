@@ -112,5 +112,9 @@ return [
     'active_contract_exists' => 'Active Contract Exists',
     'cannot_activate_contract' => 'This client already has an active contract. Only one contract can be active at a time.',
     'copy_contract' => 'Copy Contract',
-
+    'emergency_visit_created' => 'Emergency Visit Created',
+    'emergency_visit_created_success' => 'Emergency visit created successfully for client :client_name at branch :branch_name',
+    'emergency_visit_received' => 'Emergency Visit Received',
+    'emergency_visit_created_received' => 'Emergency visit Received successfully for client :client_name at branch :branch_name',
+    'view_details' => 'View Details',
 ];

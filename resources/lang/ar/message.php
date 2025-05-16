@@ -112,4 +112,9 @@ return [
     'active_contract_exists' => 'يوجد عقد نشط',
     'cannot_activate_contract' => 'هذا العميل لديه بالفعل عقد نشط. يمكن أن يكون عقد واحد فقط نشطًا في وقت واحد.',
     'copy_contract' => 'نسخ العقد',
+    'emergency_visit_created' => 'تم إنشاء زيارة طارئة',
+    'emergency_visit_created_success' => 'تم إنشاء زيارة طارئة بنجاح للعميل :client_name في الفرع :branch_name',
+    'emergency_visit_received' => 'تم استلام الزيارة الطارئة',
+    'emergency_visit_created_received' => 'تم استلام الزيارة الطارئة بنجاح للعميل :client_name في الفرع :branch_name',
+    'view_details' => 'عرض التفاصيل',
 ];

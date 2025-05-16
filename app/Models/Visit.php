@@ -158,6 +158,7 @@ class Visit extends Model implements HasMedia
 
             if ($visit->is_emergency) {
                 $visit->status = VisitTypeEnum::EMERGENCY;
+                $visit->client_id = auth()->id();
             } else {
                 $visit->status = VisitTypeEnum::PENDING;
             }

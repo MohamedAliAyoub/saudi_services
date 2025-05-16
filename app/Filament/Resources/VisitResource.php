@@ -18,7 +18,6 @@ use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 
 
-
 // this is the resource class for the Visit model in Admin
 class VisitResource extends Resource
 {
@@ -28,60 +27,106 @@ class VisitResource extends Resource
 
     public static function form(Form $form): Form
     {
-        return $form
-            ->schema([
-                Forms\Components\DatePicker::make('date')
-                    ->label(__('message.date'))
-                    ->required(),
-                Forms\Components\TimePicker::make('time')
-                    ->label(__('message.time'))
-                    ->required(),
-                Forms\Components\Select::make('employee_id')
-                    ->label(__('message.employee'))
-                    ->relationship('employee', 'name')
-                    ->required(),
-                Forms\Components\Select::make('service_id')
-                    ->label(__('message.service'))
-                    ->relationship('services', 'name')
-                    ->options(['' => ''] + Service::query()->pluck('name', 'id')->toArray())
-                    ->required(),
-                Forms\Components\Select::make('client_id')
-                    ->label(__('message.client'))
-                    ->relationship('client', 'name')
-                    ->required()
-                    ->reactive()
-                    ->afterStateUpdated(fn(callable $set) => $set('store_id', null)),
+        if ($form->getRecord() && $form->getRecord()->exists) {
+            return $form
+                ->schema([
+                    Forms\Components\DatePicker::make('date')
+                        ->label(__('message.date'))
+                        ->required(),
+                    Forms\Components\TimePicker::make('time')
+                        ->label(__('message.time'))
+                        ->required(),
+                    Forms\Components\Select::make('employee_id')
+                        ->label(__('message.employee'))
+                        ->relationship('employee', 'name')
+                        ->required(),
+                    Forms\Components\Select::make('service_id')
+                        ->label(__('message.service'))
+                        ->relationship('services', 'name')
+                        ->options(['' => ''] + Service::query()->pluck('name', 'id')->toArray())
+                        ->required(),
+                    Forms\Components\Select::make('client_id')
+                        ->label(__('message.client'))
+                        ->relationship('client', 'name')
+                        ->required()
+                        ->reactive()
+                        ->afterStateUpdated(fn(callable $set) => $set('store_id', null)),
 
-                Forms\Components\Select::make('store_id')
-                    ->label(__('message.store'))
-                    ->options(function (callable $get) {
-                        $clientId = $get('client_id');
-                        if ($clientId) {
-                            return Store::query()->where('client_id', $clientId)->pluck('name', 'id')->toArray();
-                        }
-                        return [];
-                    })
-                    ->required(),
-                Forms\Components\Select::make('status')
-                    ->label(__('message.status'))
-                    ->options(VisitTypeEnum::asSelectArray())
-                    ->default('pending'),
-                Forms\Components\SpatieMediaLibraryFileUpload::make('images_before')
-                    ->multiple()
-                    ->collection('visit_images_before')
-                    ->directory(fn($record) => 'visits/' . $record->id . '/before')
-                    ->label(__('message.images_before')),
-                Forms\Components\SpatieMediaLibraryFileUpload::make('images_after')
-                    ->multiple()
-                    ->collection('visit_images_after')
-                    ->directory(fn($record) => 'visits/' . $record->id . '/after')
-                    ->label(__('message.images_after')),
-                Forms\Components\SpatieMediaLibraryFileUpload::make('images_reports')
-                    ->multiple()
-                    ->collection('visit_images_reports')
-                    ->directory(fn($record) => 'visits/' . $record->id . '/reports')
-                    ->label(__('message.images_reports')),
-            ]);
+
+
+                    Forms\Components\SpatieMediaLibraryFileUpload::make('images_before')
+                        ->multiple()
+                        ->collection('visit_images_before')
+                        ->directory(fn($record) => 'visits/' . $record->id . '/before')
+                        ->label(__('message.images_before')),
+                    Forms\Components\SpatieMediaLibraryFileUpload::make('images_after')
+                        ->multiple()
+                        ->collection('visit_images_after')
+                        ->directory(fn($record) => 'visits/' . $record->id . '/after')
+                        ->label(__('message.images_after')),
+                    Forms\Components\SpatieMediaLibraryFileUpload::make('images_reports')
+                        ->multiple()
+                        ->collection('visit_images_reports')
+                        ->directory(fn($record) => 'visits/' . $record->id . '/reports')
+                        ->label(__('message.images_reports')),
+                ]);
+        } else {
+            return $form
+                ->schema([
+                    Forms\Components\DatePicker::make('date')
+                        ->label(__('message.date'))
+                        ->required(),
+                    Forms\Components\TimePicker::make('time')
+                        ->label(__('message.time'))
+                        ->required(),
+                    Forms\Components\Select::make('employee_id')
+                        ->label(__('message.employee'))
+                        ->relationship('employee', 'name')
+                        ->required(),
+                    Forms\Components\Select::make('service_id')
+                        ->label(__('message.service'))
+                        ->relationship('services', 'name')
+                        ->options(['' => ''] + Service::query()->pluck('name', 'id')->toArray())
+                        ->required(),
+                    Forms\Components\Select::make('client_id')
+                        ->label(__('message.client'))
+                        ->relationship('client', 'name')
+                        ->required()
+                        ->reactive()
+                        ->afterStateUpdated(fn(callable $set) => $set('store_id', null)),
+
+                    Forms\Components\Select::make('store_id')
+                        ->label(__('message.store'))
+                        ->options(function (callable $get) {
+                            $clientId = $get('client_id');
+                            if ($clientId) {
+                                return Store::query()->where('client_id', $clientId)->pluck('name', 'id')->toArray();
+                            }
+                            return [];
+                        })
+                        ->required()
+                    ,
+                    Forms\Components\Select::make('status')
+                        ->label(__('message.status'))
+                        ->options(VisitTypeEnum::asSelectArray())
+                        ->default('pending'),
+                    Forms\Components\SpatieMediaLibraryFileUpload::make('images_before')
+                        ->multiple()
+                        ->collection('visit_images_before')
+                        ->directory(fn($record) => 'visits/' . $record->id . '/before')
+                        ->label(__('message.images_before')),
+                    Forms\Components\SpatieMediaLibraryFileUpload::make('images_after')
+                        ->multiple()
+                        ->collection('visit_images_after')
+                        ->directory(fn($record) => 'visits/' . $record->id . '/after')
+                        ->label(__('message.images_after')),
+                    Forms\Components\SpatieMediaLibraryFileUpload::make('images_reports')
+                        ->multiple()
+                        ->collection('visit_images_reports')
+                        ->directory(fn($record) => 'visits/' . $record->id . '/reports')
+                        ->label(__('message.images_reports')),
+                ]);
+        }
     }
 
     public static function table(Table $table): Table
