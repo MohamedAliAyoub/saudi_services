@@ -132,7 +132,7 @@ class ClientResource extends Resource
                             ->label(__('message.stores'))
                             ->relationship('stores')
                             ->schema([
-                                Grid::make(4)
+                                Grid::make(5)
                                     ->schema([
                                         TextInput::make('name.en')
                                             ->label(__('message.name_en'))
@@ -148,6 +148,21 @@ class ClientResource extends Resource
                                         TextInput::make('phone')
                                             ->label(__('message.phone'))
                                             ->required(),
+                                     Select::make('employee_id')
+                                         ->label(__('message.employee'))
+                                         ->options(\App\Models\Employee::pluck('name', 'id')->toArray())
+                                         ->required(fn (string $context): bool => $context === 'create')
+                                         ->reactive()
+                                         ->afterStateUpdated(function ($state, callable $get, callable $set, $livewire) {
+                                             // Get the current visits array from the store
+                                             $visitsPath = 'visits';
+                                             $visits = $get($visitsPath) ?? [];
+
+                                             // Update employee_id for all visits in this store
+                                             foreach ($visits as $visitIndex => $visit) {
+                                                 $set("{$visitsPath}.{$visitIndex}.employee_id", $state);
+                                             }
+                                         }),
                                     ]),
 
                                 Section::make(__('message.visits'))
