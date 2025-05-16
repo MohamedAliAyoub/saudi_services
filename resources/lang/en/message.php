@@ -110,6 +110,7 @@ return [
     'contract_date_overlap' => 'The client already has an active contract during this period (from :start to :end).',
     'activate_contract' => 'Activate Contract',
     'active_contract_exists' => 'Active Contract Exists',
+    'active_contract' => 'Active Contract',
     'cannot_activate_contract' => 'This client already has an active contract. Only one contract can be active at a time.',
     'copy_contract' => 'Copy Contract',
     'emergency_visit_created' => 'Emergency Visit Created',

@@ -55,7 +55,8 @@ class User extends Authenticatable implements FilamentUser
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'password' => 'hashed'
+        'password' => 'hashed',
+        'name' => 'array'
     ];
 
 
@@ -63,6 +64,29 @@ class User extends Authenticatable implements FilamentUser
     {
         return $query->where('role', 'admin');
     }
+
+   public function getNameAttribute($value)
+   {
+       // If name is already an array (Laravel decoded JSON)
+       if (is_array($value)) {
+           return $value['ar'] ?? $value;
+       }
+
+       // If name is stored as JSON string
+       if (is_string($value) && $this->isJson($value)) {
+           $decoded = json_decode($value, true);
+           return $decoded['ar'] ?? $value;
+       }
+
+       // Otherwise return as is
+       return $value;
+   }
+
+   private function isJson($string) {
+       if (!is_string($string)) return false;
+       json_decode($string);
+       return json_last_error() === JSON_ERROR_NONE;
+   }
 
     public function scopeEmployees($query)
     {

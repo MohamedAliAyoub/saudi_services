@@ -110,6 +110,7 @@ return [
     'contract_date_overlap' => 'تداخل في تواريخ العقود',
     'activate_contract' => 'تفعيل العقد',
     'active_contract_exists' => 'يوجد عقد نشط',
+    'active_contract' => ' عقد نشط',
     'cannot_activate_contract' => 'هذا العميل لديه بالفعل عقد نشط. يمكن أن يكون عقد واحد فقط نشطًا في وقت واحد.',
     'copy_contract' => 'نسخ العقد',
     'emergency_visit_created' => 'تم إنشاء زيارة طارئة',
