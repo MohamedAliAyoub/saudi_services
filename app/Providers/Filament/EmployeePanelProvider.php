@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Employee\Widgets\EmployeeVisitsWidget;
 use App\Filament\Resources\AdminResource\Widgets\AdminImageWidget;
 use App\Filament\Resources\AdminResource\Widgets\ClientImageWidget;
 use App\Http\Middleware\LanguageMiddleware;
@@ -53,6 +54,8 @@ class EmployeePanelProvider extends PanelProvider
             ->widgets([
                 AdminImageWidget::class,
                 ClientImageWidget::class,
+                EmployeeVisitsWidget::class,
+
             ])
             ->middleware([
                 EncryptCookies::class,

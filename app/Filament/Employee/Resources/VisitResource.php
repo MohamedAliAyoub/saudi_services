@@ -2,6 +2,7 @@
 
 namespace App\Filament\Employee\Resources;
 
+use App\Filament\Client\Resources\VisitResource\Pages\ViewVisit;
 use App\Filament\Employee\Resources\VisitResource\Pages;
 use App\Filament\Employee\Resources\VisitResource\RelationManagers;
 use App\Models\Visit;
@@ -23,7 +24,45 @@ class VisitResource extends Resource
     {
         return $form
             ->schema([
-                //
+                Forms\Components\Grid::make()
+                    ->schema([
+                        Forms\Components\Checkbox::make('mark_as_complete')
+                            ->label(__('message.mark_as_complete'))
+                            ->reactive()
+                            ->afterStateUpdated(function ($state, callable $set) {
+                                if ($state) {
+                                    $set('status', 'done');
+                                    $set('visit_date', now()->format('Y-m-d H:i:s'));
+                                }
+                            })
+                            ->default(function ($record) {
+                                return $record && ($record->status == \App\Enums\VisitTypeEnum::DONE || $record->status == 'done');
+                            })
+                            ->dehydrated(false),
+                        Forms\Components\Hidden::make('status')
+                            ->default('pending'),
+
+
+                        Forms\Components\DateTimePicker::make('visit_date')
+                            ->label(__('message.visit_date'))
+                            ->seconds(true)
+                            ->required(),
+                        Forms\Components\SpatieMediaLibraryFileUpload::make('images_before')
+                            ->multiple()
+                            ->collection('visit_images_before')
+                            ->directory(fn($record) => 'visits/' . $record->id . '/before')
+                            ->label(__('message.images_before')),
+                        Forms\Components\SpatieMediaLibraryFileUpload::make('images_after')
+                            ->multiple()
+                            ->collection('visit_images_after')
+                            ->directory(fn($record) => 'visits/' . $record->id . '/after')
+                            ->label(__('message.images_after')),
+                        Forms\Components\SpatieMediaLibraryFileUpload::make('images_reports')
+                            ->multiple()
+                            ->collection('visit_images_reports')
+                            ->directory(fn($record) => 'visits/' . $record->id . '/reports')
+                            ->label(__('message.images_reports')),
+                    ]),
             ]);
     }
 
@@ -31,13 +70,30 @@ class VisitResource extends Resource
     {
         return $table
             ->columns([
-                //
+                Tables\Columns\TextColumn::make('client.name')
+                    ->label(__('message.client')),
+                Tables\Columns\TextColumn::make('store.address')
+                    ->label(__('message.store')),
+                Tables\Columns\TextColumn::make('date')
+                    ->label(__('message.visit_date'))
+                    ->date(),
+                Tables\Columns\TextColumn::make('visit_date')
+                    ->label(__('message.visit_date_done'))
+                    ->dateTime('Y-m-d H:i'),
+                Tables\Columns\TextColumn::make('status')
+                    ->label(__('message.status'))
+                    ->badge()
+                    ->color(fn($state): string => $state instanceof \App\Enums\VisitTypeEnum
+                        ? $state->getColor()
+                        : 'secondary'
+                    ),
             ])
             ->filters([
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->label(__('message.save_visit')),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -59,6 +115,17 @@ class VisitResource extends Resource
             'index' => Pages\ListVisits::route('/'),
             'create' => Pages\CreateVisit::route('/create'),
             'edit' => Pages\EditVisit::route('/{record}/edit'),
+            'view' => ViewVisit::route('/{record}'),
+
         ];
     }
+
+    public function query()
+    {
+        return Visit::query()
+            ->where('employee_id', auth()->id())
+            ->with(['client', 'store'])
+            ->orderByDesc('id');
+    }
 }
+

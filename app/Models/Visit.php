@@ -28,11 +28,13 @@ class Visit extends Model implements HasMedia
         'rate',
         'is_emergency',
         'emergency_comment',
+        'visit_date'
     ];
 
     protected $casts = [
         'date' => 'datetime:Y-m-d',
         'time' => 'datetime:H:i:s',
+        'visit_date' => 'datetime:Y-m-d H:i:s',
         'status' => VisitTypeEnum::class,
         'image' => 'array',
     ];

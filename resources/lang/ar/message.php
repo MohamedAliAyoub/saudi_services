@@ -118,4 +118,11 @@ return [
     'emergency_visit_received' => 'تم استلام الزيارة الطارئة',
     'emergency_visit_created_received' => 'تم استلام الزيارة الطارئة بنجاح للعميل :client_name في الفرع :branch_name',
     'view_details' => 'عرض التفاصيل',
+    'visit_date' => 'تاريخ الزيارة',
+    'mark_as_complete' => 'تمت الزيارة بالفعل',
+    'visit_date_done' => 'تاريخ الزيارة الحقيقي',
+    'visit_received_done' => 'تمت الزيارة بنجاح',
+    'visit_received_done_message' => 'تمت الزيارة بنجاح للعميل :client_name في الفرع :branch_name',
+    'save_visit' => 'تسجيل الزيارة',
+
 ];

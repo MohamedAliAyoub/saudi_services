@@ -118,4 +118,11 @@ return [
     'emergency_visit_received' => 'Emergency Visit Received',
     'emergency_visit_created_received' => 'Emergency visit Received successfully for client :client_name at branch :branch_name',
     'view_details' => 'View Details',
-];
+    'visit_date' => 'Visit Date',
+    'mark_as_complete' => 'Mark as Complete',
+    'visit_date_done' => 'Visit Date Done',
+    'visit_received_done' => 'Visit done successfully',
+    'visit_received_done_message' => 'Visit received successfully for client :client_name at branch :branch_name',
+    'save_visit' => 'Store Visit',
+    ];
+
