@@ -276,13 +276,14 @@ class ContractResource extends Resource
                     ->date()
                     ->sortable(),
 
-                Tables\Columns\IconColumn::make('status')
-                    ->label(__('message.status'))
-                    ->boolean()
-                    ->trueIcon('heroicon-o-check-circle')
-                    ->falseIcon('heroicon-o-x-circle')
-                    ->trueColor('success')
-                    ->falseColor('danger'),
+               Tables\Columns\IconColumn::make('status')
+                   ->label(__('message.status'))
+                   ->boolean()
+                   ->getStateUsing(fn (Contract $record): bool => $record->status === 'active')
+                   ->trueIcon('heroicon-o-check-circle')
+                   ->falseIcon('heroicon-o-x-circle')
+                   ->trueColor('success')
+                   ->falseColor('danger'),
             ])
             ->filters([
                 //
