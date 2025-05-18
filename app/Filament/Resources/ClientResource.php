@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\UserTypeEnum;
+use App\Enums\VisitTypeEnum;
 use App\Filament\Resources\ClientResource\Pages;
 use App\Filament\Resources\ClientResource\RelationManagers;
 use App\Models\Client;
@@ -336,7 +338,7 @@ class ClientResource extends Resource
         });
 
         return parent::getEloquentQuery()
-            ->where('role', 'client')
+            ->where('role', UserTypeEnum::CLIENT)
             ->with(['activeContract.stores.visits'])
             ->orderBy('id', 'desc');
     }
@@ -348,7 +350,7 @@ class ClientResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return static::getModel()::query()->where('role', 'client')->count();
+        return static::getModel()::query()->where('role', UserTypeEnum::CLIENT)->count();
     }
 
     public static function getTitle(): string

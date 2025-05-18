@@ -48,7 +48,6 @@ enum UserTypeEnum: string implements HasColor, HasIcon, HasLabel
     {
         return [
             self::ADMIN->value => self::ADMIN->getLabel(),
-            self::CLIENT->value => self::CLIENT->getLabel(),
             self::EMPLOYEE->value => self::EMPLOYEE->getLabel(),
         ];
     }

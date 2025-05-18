@@ -14,7 +14,6 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Hash;
 
 class UserResource extends Resource
@@ -53,11 +52,6 @@ class UserResource extends Resource
                 Forms\Components\TextInput::make('address')
                     ->label(__('message.address'))
                     ->required(),
-                Forms\Components\TextInput::make('company_name')
-                    ->label(__('message.Company_Name'))
-                    ->unique(ignoreRecord: true),
-                Forms\Components\TextInput::make('store_numbers')
-                    ->label(__('message.store_numbers')),
                 Forms\Components\FileUpload::make('image')
                     ->image()
                     ->directory('users')
@@ -90,14 +84,6 @@ class UserResource extends Resource
                     ->disk('public'),
                 Tables\Columns\TextColumn::make('address')
                     ->label(__('message.address'))
-                    ->searchable()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('company_name')
-                    ->label(__('message.Company_Name'))
-                    ->searchable()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('store_numbers')
-                    ->label(__('message.store_numbers'))
                     ->searchable()
                     ->sortable(),
             ])
@@ -138,9 +124,23 @@ class UserResource extends Resource
         return __('message.Users');
     }
 
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->whereIn('role', [
+                UserTypeEnum::EMPLOYEE,
+                UserTypeEnum::ADMIN,
+            ]);
+    }
+
     public static function getNavigationBadge(): ?string
     {
-        return static::getModel()::query()->count();
+        return static::getModel()::query()
+            ->whereIn('role', [
+                UserTypeEnum::EMPLOYEE,
+                UserTypeEnum::ADMIN,
+            ])
+            ->count();
     }
 
     public static function getTitle(): string
