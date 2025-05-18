@@ -10,6 +10,10 @@ class EditStore extends EditRecord
 {
     protected static string $resource = StoreResource::class;
 
+    protected function getRedirectUrl(): string
+    {
+        return static::getResource()::getUrl('index');
+    }
     protected function getHeaderActions(): array
     {
         return [

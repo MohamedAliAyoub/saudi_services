@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 
 class Store extends Model
 {
@@ -25,19 +26,23 @@ class Store extends Model
     protected $casts = [
         'name' => 'array',
     ];
+    protected $appends = ['translated_name'];
 
-    public function client(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'client_id')
-            ->where('role', 'client');
-    }
+
+//    public function client(): BelongsTo
+//    {
+//        return $this->belongsTo(User::class, 'client_id')
+//            ->where('role', 'client');
+//    }
+
+
 
     public function contracts(): BelongsTo
     {
         return $this->belongsTo(Contract::class, 'contract_id');
     }
 
-    public function activeContractStores() :HasManyThrough
+    public function activeContractStores(): HasManyThrough
     {
         return $this->hasManyThrough(
             Store::class,
@@ -59,10 +64,28 @@ class Store extends Model
         return $this->hasMany(Visit::class, 'store_id')->with('client');
     }
 
+    public function getTranslatedNameAttribute()
+    {
+        if (is_array($this->name))
+            return $this->name[app()->getLocale()] ?? $this->name['ar'];
+        else
+            return $this->name;
+    }
 
     public function contract(): BelongsTo
     {
         return $this->belongsTo(Contract::class);
+    }
+    public function clientThroughContract(): HasOneThrough
+    {
+        return $this->hasOneThrough(
+            User::class,
+            Contract::class,
+            'id',
+            'id',
+            'contract_id',
+            'client_id'
+        );
     }
 
     protected static function boot()

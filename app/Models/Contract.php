@@ -22,6 +22,24 @@ class Contract extends Model
         'status',
     ];
 
+    // In app/Models/Contract.php
+
+    protected $appends = ['name'];
+
+    public function getNameAttribute(): string
+    {
+        $clientName = $this->client->translated_name ?? 'Unknown Client';
+
+        return "Contract #{$this->id} - {$clientName} (" .
+            (($this->contract_create_date instanceof \DateTime) ?
+                $this->contract_create_date->format('d/m/Y') :
+                ($this->contract_create_date ? \Carbon\Carbon::parse($this->contract_create_date)->format('d/m/Y') : 'No start date')) .
+            " to " .
+            (($this->contract_end_date instanceof \DateTime) ?
+                $this->contract_end_date->format('d/m/Y') :
+                ($this->contract_end_date ? \Carbon\Carbon::parse($this->contract_end_date)->format('d/m/Y') : 'No end date')) .
+            ")";
+    }
     public function client(): BelongsTo
     {
         return $this->belongsTo(Client::class, 'client_id');

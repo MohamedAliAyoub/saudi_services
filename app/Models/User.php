@@ -35,7 +35,8 @@ class User extends Authenticatable implements FilamentUser
         'image',
         'phone',
     ];
-    protected $appends = ['image_url'];
+    protected $appends = ['image_url' , 'translated_name'];
+
 
 
     /**
@@ -59,6 +60,14 @@ class User extends Authenticatable implements FilamentUser
         'name' => 'array'
     ];
 
+
+    public function getTranslatedNameAttribute()
+    {
+        if (is_array($this->name))
+            return  $this->name['ar'];
+        else
+            return $this->name;
+    }
 
     public function scopeAdmins($query)
     {
