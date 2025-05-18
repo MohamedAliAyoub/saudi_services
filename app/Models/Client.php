@@ -2,11 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Builder;
 use Spatie\Translatable\HasTranslations;
 
 class Client extends User
@@ -20,6 +19,12 @@ class Client extends User
         'name' => 'array',
     ];
 
+    protected static function booted(): void
+    {
+        static::addGlobalScope('client', function (Builder $builder) {
+            $builder->where('role', 'client');
+        });
+    }
 
     public function stores(): HasMany
     {
