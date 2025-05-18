@@ -16,7 +16,6 @@ use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\SpatieLaravelTranslatablePlugin;
 use Filament\Support\Colors\Color;
-use Filament\Widgets;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -46,7 +45,7 @@ class AdminPanelProvider extends PanelProvider
                     ->icon('heroicon-o-globe-asia-australia'),
             ])
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => Color::Cyan,
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
@@ -57,6 +56,8 @@ class AdminPanelProvider extends PanelProvider
             ->widgets([
                 AdminImageWidget::class,
                 ClientImageWidget::class,
+//                CustomersChart::class,
+//                OrdersChart::class,
             ])
             ->middleware([
                 EncryptCookies::class,

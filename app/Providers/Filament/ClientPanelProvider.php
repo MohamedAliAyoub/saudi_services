@@ -4,19 +4,15 @@ namespace App\Providers\Filament;
 
 use App\Filament\Resources\AdminResource\Widgets\AdminImageWidget;
 use App\Filament\Resources\AdminResource\Widgets\ClientImageWidget;
-use App\Filament\Widgets\CustomersChart;
-use App\Filament\Widgets\OrdersChart;
 use App\Filament\Widgets\StatsOverviewWidget;
 use App\Http\Middleware\LanguageMiddleware;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Navigation\MenuItem;
 use Filament\Navigation\NavigationGroup;
 use Filament\Navigation\NavigationItem;
 use Filament\Navigation\UserMenuItem;
-use Filament\Notifications\Livewire\DatabaseNotifications;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -59,8 +55,6 @@ class ClientPanelProvider extends PanelProvider
             ->widgets([
                 AdminImageWidget::class,
                 ClientImageWidget::class,
-                CustomersChart::class,
-                OrdersChart::class,
                 StatsOverviewWidget::class
             ])
             ->middleware([

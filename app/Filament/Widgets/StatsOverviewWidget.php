@@ -2,6 +2,8 @@
 
 namespace App\Filament\Widgets;
 
+use App\Enums\VisitTypeEnum;
+use App\Models\Visit;
 use Carbon\Carbon;
 use Filament\Widgets\Concerns\InteractsWithPageFilters;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
@@ -35,9 +37,10 @@ class StatsOverviewWidget extends BaseWidget
 
         $diffInDays = $startDate ? $startDate->diffInDays($endDate) : 0;
 
-        $done_visits = 500;
-        $late_visits = (int) 4;
-        $pending_visits = (int) 440;
+        $visits = Visit::query()->get();
+        $done_visits = $visits->where('status', VisitTypeEnum::DONE)->count();
+        $late_visits = $visits->where('status', VisitTypeEnum::LATE)->count();
+        $pending_visits = $visits->where('status', VisitTypeEnum::PENDING)->count();
 
         $formatNumber = function (int $number): string {
             if ($number < 1000) {
@@ -53,17 +56,17 @@ class StatsOverviewWidget extends BaseWidget
 
         return [
             Stat::make(__("message.DONE_VISITS"),   $formatNumber($done_visits))
-                ->description('32k ' . __('message.increase'))
+                ->description(' ' . __('message.increase'))
                 ->descriptionIcon('heroicon-m-arrow-trending-up')
                 ->chart([7, 2, 10, 3, 15, 4, 17])
                 ->color('success'),
             Stat::make(__("message.LATE_VISITS"), $formatNumber($late_visits))
-                ->description('3% ' . __('message.decrease'))
+                ->description(' ' . __('message.decrease'))
                 ->descriptionIcon('heroicon-m-arrow-trending-down')
                 ->chart([17, 16, 14, 15, 14, 13, 12])
                 ->color('danger'),
             Stat::make(__("message.PENDING_VISITS"), $formatNumber($pending_visits))
-                ->description('7% ' . __('message.increase'))
+                ->description('' . __('message.increase'))
                 ->descriptionIcon('heroicon-m-arrow-trending-up')
                 ->chart([15, 4, 10, 2, 12, 4, 12])
                 ->color('success'),

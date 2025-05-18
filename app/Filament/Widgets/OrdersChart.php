@@ -10,6 +10,10 @@ class OrdersChart extends ChartWidget
 
     protected static ?int $sort = 1;
 
+    public static function canView(): bool
+    {
+        return false;
+    }
     protected function getType(): string
     {
         return 'line';

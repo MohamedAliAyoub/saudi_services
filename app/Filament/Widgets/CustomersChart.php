@@ -14,6 +14,10 @@ class CustomersChart extends ChartWidget
     {
         return 'line';
     }
+    public static function canView(): bool
+    {
+        return false;
+    }
 
     protected function getData(): array
     {

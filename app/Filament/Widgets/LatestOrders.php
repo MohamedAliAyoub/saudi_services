@@ -2,54 +2,55 @@
 
 namespace App\Filament\Widgets;
 
-use App\Filament\Resources\Shop\OrderResource;
-use App\Models\Shop\Order;
+use App\Enums\VisitTypeEnum;
 use App\Models\Visit;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
-use Squire\Models\Currency;
+use Illuminate\Database\Eloquent\Builder;
 
 class LatestOrders extends BaseWidget
 {
     protected int | string | array $columnSpan = 'full';
+
+    protected static ?string $heading = 'Today\'s Visits';
+
 
     protected static ?int $sort = 2;
 
     public function table(Table $table): Table
     {
         return $table
-            ->query(fn () => Visit::query())
+            ->query(
+                Visit::query()
+                    ->whereDate('date', today())
+                    ->with(['client', 'store'])
+            )
             ->defaultPaginationPageOption(5)
-            ->defaultSort('created_at', 'desc')
+            ->defaultSort('date', 'desc')
             ->columns([
-                Tables\Columns\TextColumn::make('created_at')
-                    ->label('Order Date')
-                    ->date()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('number')
-                    ->searchable()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('customer.name')
-                    ->searchable()
-                    ->sortable(),
+                Tables\Columns\TextColumn::make('client.name')
+                    ->label(__('message.client')),
+                Tables\Columns\TextColumn::make('store.address')
+                    ->label(__('message.store')),
+                Tables\Columns\TextColumn::make('date')
+                    ->label(__('message.visit_date'))
+                    ->date(),
+                Tables\Columns\TextColumn::make('visit_date')
+                    ->label(__('message.visit_date_done'))
+                    ->dateTime('Y-m-d H:i'),
                 Tables\Columns\TextColumn::make('status')
-                    ->badge(),
-                Tables\Columns\TextColumn::make('currency')
-                    ->getStateUsing("test")
-                    ->searchable()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('total_price')
-                    ->searchable()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('shipping_price')
-                    ->label('Shipping cost')
-                    ->searchable()
-                    ->sortable(),
+                    ->label(__('message.status'))
+                    ->badge()
+                    ->color(fn($state): string => $state instanceof VisitTypeEnum
+                        ? $state->getColor()
+                        : 'secondary'
+                    ),
             ])
             ->actions([
-//                Tables\Actions\Action::make('open');
-//                    ->url(fn (Order $record): string => OrderResource::getUrl('edit', ['record' => $record])),
+                Tables\Actions\EditAction::make()
+                    ->label(__('message.save_visit'))
+                    ->url(fn (Visit $record): string => route('filament.admin.resources.visits.edit', ['record' => $record])),
             ]);
     }
 }
