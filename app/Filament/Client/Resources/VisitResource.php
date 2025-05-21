@@ -80,69 +80,66 @@ class VisitResource extends Resource
 
     }
 
-    public static function table(Table $table): Table
-    {
-        return $table
-            ->columns([
-                Tables\Columns\TextColumn::make('date')
-                    ->label(__('message.date'))
-                    ->dateTime('Y-m-d'),
-                Tables\Columns\TextColumn::make('time')
-                    ->label(__('message.time'))
-                    ->dateTime('H:i:s'),
-                Tables\Columns\TextColumn::make('store.address')
-                    ->label(__('message.store'))
-                    ->searchable()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('status')
-                    ->label(__('message.status'))
-                    ->searchable('status')
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('client.name')
-                    ->label(__('message.client'))
-                    ->searchable()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('employee.name')
-                    ->label(__('message.employee'))
-                    ->searchable()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('services.name')
-                    ->label(__('message.services'))
-                    ->searchable()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('rate')
-                    ->label(__('message.rate'))
-                    ->sortable()
-                    ->searchable()
-                    ->view('filament.tables.columns.star-rating-column'),
-                Tables\Columns\TextColumn::make('comment')
-                    ->label(__('message.comment'))
-                    ->limit(40) // Truncate comments longer than 50 characters
-                    ->tooltip(fn($record) => $record->comment), // Show full comment on hover
-
-                Tables\Columns\TextColumn::make('emergency_comment')
-                    ->label(__('message.emergency_visit_comment'))
-                    ->limit(40) // Truncate comments longer than 50 characters
-                    ->tooltip(fn($record) => $record->comment), // Show full comment on hover
-
-            ])
-            ->filters([
-                Tables\Filters\SelectFilter::make('status')
-                    ->label(__('message.status'))
-                    ->options(VisitTypeEnum::asSelectArray()),
-            ])
-            ->actions([
-                Tables\Actions\EditAction::make()
-                    ->label(__('message.rate')),
-                Tables\Actions\ViewAction::make(),
-
-            ])
-            ->bulkActions([
-                // No bulk actions
-            ]);
-    }
-
-
+public static function table(Table $table): Table
+{
+    return $table
+        ->columns([
+            Tables\Columns\TextColumn::make('date')
+                ->label(__('message.date'))
+                ->dateTime('Y-m-d'),
+            Tables\Columns\TextColumn::make('time')
+                ->label(__('message.time'))
+                ->dateTime('H:i:s'),
+            Tables\Columns\TextColumn::make('store.address')
+                ->label(__('message.store'))
+                ->searchable()
+                ->sortable(),
+            Tables\Columns\TextColumn::make('status')
+                ->label(__('message.status'))
+                ->searchable('status')
+                ->sortable(),
+            Tables\Columns\TextColumn::make('client.name')
+                ->label(__('message.client'))
+                ->searchable()
+                ->sortable(),
+            Tables\Columns\TextColumn::make('employee.name')
+                ->label(__('message.employee'))
+                ->searchable()
+                ->sortable(),
+            Tables\Columns\TextColumn::make('services.name')
+                ->label(__('message.services'))
+                ->searchable()
+                ->sortable(),
+            Tables\Columns\TextColumn::make('rate')
+                ->label(__('message.rate'))
+                ->sortable()
+                ->searchable()
+                ->view('filament.tables.columns.star-rating-column'),
+            Tables\Columns\TextColumn::make('comment')
+                ->label(__('message.comment'))
+                ->limit(40)
+                ->tooltip(fn($record) => $record->comment),
+            Tables\Columns\TextColumn::make('emergency_comment')
+                ->label(__('message.emergency_visit_comment'))
+                ->limit(40)
+                ->tooltip(fn($record) => $record->comment),
+        ])
+        ->filters([
+            Tables\Filters\SelectFilter::make('store_id')
+                ->label(__('message.store'))
+                ->attribute('store_id'),
+            Tables\Filters\SelectFilter::make('status')
+                ->label(__('message.status'))
+                ->options(VisitTypeEnum::asSelectArray()),
+        ])
+        ->actions([
+            Tables\Actions\EditAction::make()
+                ->label(__('message.rate')),
+            Tables\Actions\ViewAction::make(),
+        ])
+        ->headerActions([]) // Explicitly define empty header actions
+        ->emptyStateActions([]); // Explicitly define empty state actions
+}
     public static function infolist(Infolist $infolist): Infolist
     {
         return $infolist
@@ -203,9 +200,17 @@ class VisitResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
+
         Visit::updateStatus();
-        return parent::getEloquentQuery()
+        $query = parent::getEloquentQuery()
+            ->with(['store', 'client', 'employee', 'services', 'images'])
             ->orderByRaw("status = ? DESC", [VisitTypeEnum::EMERGENCY->value])
             ->orderBy('id', 'desc');
+
+        if (request()->has('store_id')) {
+            $query->where('store_id', request('store_id'));
+        }
+        return $query;
+
     }
 }

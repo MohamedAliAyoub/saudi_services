@@ -124,5 +124,6 @@ return [
     'visit_received_done' => 'تمت الزيارة بنجاح',
     'visit_received_done_message' => 'تمت الزيارة بنجاح للعميل :client_name في الفرع :branch_name',
     'save_visit' => 'تسجيل الزيارة',
+    'id' => 'الرقم ',
 
 ];

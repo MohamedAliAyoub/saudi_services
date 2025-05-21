@@ -55,6 +55,7 @@ class Visit extends Model implements HasMedia
         return $this->belongsTo(Store::class);
     }
 
+
     public function client(): BelongsTo
     {
         return $this->belongsTo(User::class, 'client_id', 'id')

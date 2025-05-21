@@ -2,9 +2,9 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Client\Widgets\StatsOverviewWidget;
 use App\Filament\Resources\AdminResource\Widgets\AdminImageWidget;
 use App\Filament\Resources\AdminResource\Widgets\ClientImageWidget;
-use App\Filament\Widgets\StatsOverviewWidget;
 use App\Http\Middleware\LanguageMiddleware;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -44,7 +44,7 @@ class ClientPanelProvider extends PanelProvider
                     ->icon('heroicon-o-globe-asia-australia'),
             ])
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => Color::Sky,
             ])
             ->discoverResources(in: app_path('Filament/Client/Resources'), for: 'App\\Filament\\Client\\Resources')
             ->discoverPages(in: app_path('Filament/Client/Pages'), for: 'App\\Filament\\Client\\Pages')

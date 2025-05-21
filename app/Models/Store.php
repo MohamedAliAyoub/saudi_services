@@ -26,7 +26,7 @@ class Store extends Model
     protected $casts = [
         'name' => 'array',
     ];
-    protected $appends = ['translated_name'];
+    protected $appends = ['translated_name' , 'visits_count'];
 
 
 //    public function client(): BelongsTo
@@ -42,6 +42,10 @@ class Store extends Model
         return $this->belongsTo(Contract::class, 'contract_id');
     }
 
+    public function getVisitsCountAttribute(): int
+    {
+        return $this->visits()->count();
+    }
     public function activeContractStores(): HasManyThrough
     {
         return $this->hasManyThrough(

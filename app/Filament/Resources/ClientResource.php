@@ -22,6 +22,7 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 
+
 // Correct import
 
 use Illuminate\Support\Facades\Hash;
@@ -310,7 +311,7 @@ class ClientResource extends Resource
     public static function getRelations(): array
     {
         return [
-//            'App\Filament\Resources\ClientResource\RelationManagers\StoresRelationManager',
+//            'App\Filament\Resources\ClientResource\RelationManagers\ClientContractStoresRelationManager',
 //            'App\Filament\Resources\ClientResource\RelationManagers\VisitsRelationManager',
 //            'App\Filament\Resources\ClientResource\RelationManagers\ContractsRelationManager',
         ];

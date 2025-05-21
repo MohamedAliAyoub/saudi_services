@@ -124,5 +124,6 @@ return [
     'visit_received_done' => 'Visit done successfully',
     'visit_received_done_message' => 'Visit received successfully for client :client_name at branch :branch_name',
     'save_visit' => 'Store Visit',
+    'id' => 'ID',
     ];
 
