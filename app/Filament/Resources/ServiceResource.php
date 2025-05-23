@@ -7,12 +7,14 @@ use App\Filament\Resources\ServiceResource\RelationManagers;
 use App\Models\Service;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Log;
 
 class ServiceResource extends Resource
 {
@@ -44,8 +46,53 @@ class ServiceResource extends Resource
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->using(function ($records, $action) {
+                            $failedRecords = [];
+                            $successCount = 0;
+
+                            foreach ($records as $record) {
+                                try {
+                                    $record->delete();
+                                    $successCount++;
+                                } catch (\Throwable $e) {
+                                    $failedRecords[] = $record->name ?? $record->id;
+
+                                    //         Write to a specific file for debugging
+//                                    file_put_contents(
+//                                        storage_path('logs/visit-debug.log'),
+//                                        'delete not success ' . $e->getMessage() . PHP_EOL,
+//                                        FILE_APPEND
+//                                    );
+                                    Notification::make()
+                                        ->title(__('message.error'))
+                                        ->body(__('message.cannot_delete_service_in_use', [
+                                            'name' => $record->name ?? $record->id,
+                                        ]))
+                                        ->danger()
+                                        ->send();
+                                    break;
+                                }
+                            }
+
+                            if (!empty($failedRecords)) {
+                                $action->failure(
+                                    __('message.some_services_in_use', [
+                                        'services' => implode(', ', $failedRecords),
+                                    ])
+                                );
+
+                                return;
+                            }
+
+                            $action->success(__('message.deleted_successfully', [
+                                'count' => $successCount
+                            ]));
+                        }),
+                ]),
             ]);
+
     }
 
     public static function getRelations(): array

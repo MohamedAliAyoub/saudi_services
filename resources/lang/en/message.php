@@ -125,5 +125,8 @@ return [
     'visit_received_done_message' => 'Visit received successfully for client :client_name at branch :branch_name',
     'save_visit' => 'Store Visit',
     'id' => 'ID',
+    'error'=> 'Error',
+    'cannot_delete_service_in_use' => 'This service cannot be deleted because it is being used by partners.',
+    'some_services_in_use' => 'The following services could not be deleted because they are in use: :services',
     ];
 

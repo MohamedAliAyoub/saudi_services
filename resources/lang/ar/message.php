@@ -125,5 +125,8 @@ return [
     'visit_received_done_message' => 'تمت الزيارة بنجاح للعميل :client_name في الفرع :branch_name',
     'save_visit' => 'تسجيل الزيارة',
     'id' => 'الرقم ',
+    'error'=> 'خطأ',
+    'cannot_delete_service_in_use' => 'لا يمكن حذف هذه الخدمة لأنها قيد الاستخدام من قبل الشركاء.',
+    'some_services_in_use' => 'لم يتم حذف الخدمات التالية لأنها قيد الاستخدام: :services',
 
 ];
