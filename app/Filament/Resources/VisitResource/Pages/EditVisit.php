@@ -48,10 +48,26 @@ class EditVisit extends EditRecord
 //                FILE_APPEND
 //            );
 
-            // Rest of your notification code
+            // client notification
             Notification::make()
                 ->title(__('message.emergency_visit_received'))
                 ->body(__('message.emergency_visit_created_received', [
+                    'client_name' => auth()->user()->name,
+                    'branch_name' => $this->record->store->address,
+                ]))
+                ->icon('heroicon-o-calendar')
+                ->actions([
+                    Action::make('edit')
+                        ->label(__('message.view_details'))
+                        ->url(route('filament.client.resources.visits.index'))
+                        ->button()
+                ])
+                ->sendToDatabase($this->record->client);
+
+            // employee notification
+            Notification::make()
+                ->title(__('message.emergency_visit_assigned_to_employee'))
+                ->body(__('message.emergency_visit_created_assigned', [
                     'client_name' => auth()->user()->name,
                     'branch_name' => $this->record->store->address,
                 ]))

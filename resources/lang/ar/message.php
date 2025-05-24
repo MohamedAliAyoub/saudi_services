@@ -128,5 +128,6 @@ return [
     'error' => 'خطأ',
     'cannot_delete_service_in_use' => 'لا يمكن حذف هذه الخدمة لأنها قيد الاستخدام من قبل الشركاء.',
     'some_services_in_use' => 'لم يتم حذف الخدمات التالية لأنها قيد الاستخدام: :services',
-
+    'emergency_visit_assigned_to_employee' => 'تم تعيينك في زيارة طارئة ',
+    'emergency_visit_created_assigned' => 'تم إنشاء زيارة طارئة وتعيينها لك من العميل :client_name في الفرع :branch_name',
 ];
