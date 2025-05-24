@@ -52,7 +52,6 @@ class EditVisit extends EditRecord
             Notification::make()
                 ->title(__('message.emergency_visit_received'))
                 ->body(__('message.emergency_visit_created_received', [
-                    'client_name' => auth()->user()->name,
                     'branch_name' => $this->record->store->address,
                 ]))
                 ->icon('heroicon-o-calendar')
@@ -68,17 +67,17 @@ class EditVisit extends EditRecord
             Notification::make()
                 ->title(__('message.emergency_visit_assigned_to_employee'))
                 ->body(__('message.emergency_visit_created_assigned', [
-                    'client_name' => auth()->user()->name,
+                    'client_name' => $this->record->client?->name,
                     'branch_name' => $this->record->store->address,
                 ]))
                 ->icon('heroicon-o-calendar')
                 ->actions([
                     Action::make('edit')
                         ->label(__('message.view_details'))
-                        ->url(route('filament.client.resources.visits.index'))
+                        ->url(route('filament.employee.resources.visits.index'))
                         ->button()
                 ])
-                ->sendToDatabase($this->record->client);
+                ->sendToDatabase($this->record->employee);
         }
     }
 

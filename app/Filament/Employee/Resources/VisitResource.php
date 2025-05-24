@@ -2,6 +2,7 @@
 
 namespace App\Filament\Employee\Resources;
 
+use App\Enums\VisitTypeEnum;
 use App\Filament\Client\Resources\VisitResource\Pages\ViewVisit;
 use App\Filament\Employee\Resources\VisitResource\Pages;
 use App\Filament\Employee\Resources\VisitResource\RelationManagers;
@@ -71,6 +72,8 @@ class VisitResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('id')
+                    ->label(__('message.id')),
                 Tables\Columns\TextColumn::make('client.name')
                     ->label(__('message.client')),
                 Tables\Columns\TextColumn::make('store.address')
@@ -160,5 +163,16 @@ class VisitResource extends Resource
     {
         return 'heroicon-o-arrow-right-circle';
     }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->where('employee_id', auth()->id())
+            ->with(['client', 'store'])
+            ->orderByRaw("status = ? DESC", [VisitTypeEnum::EMERGENCY->value])
+            ->orderBy('id', 'desc');
+    }
+
 }
+
 

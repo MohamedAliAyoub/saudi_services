@@ -53,7 +53,6 @@ class VisitResource extends Resource
                         ->afterStateUpdated(fn(callable $set) => $set('store_id', null)),
 
 
-
                     Forms\Components\SpatieMediaLibraryFileUpload::make('images_before')
                         ->multiple()
                         ->collection('visit_images_before')
@@ -133,6 +132,8 @@ class VisitResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('id')
+                    ->label(__('message.id')),
                 Tables\Columns\TextColumn::make('date')
                     ->label(__('message.date'))
                     ->dateTime('Y-m-d')
@@ -243,6 +244,7 @@ class VisitResource extends Resource
     {
         Visit::updateStatus();
         return parent::getEloquentQuery()
+            ->with(['employee', 'client'])
             ->orderByRaw("status = ? DESC", [VisitTypeEnum::EMERGENCY->value])
             ->orderBy('id', 'desc');
     }

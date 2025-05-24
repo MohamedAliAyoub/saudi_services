@@ -116,7 +116,7 @@ return [
     'emergency_visit_created' => 'Emergency Visit Created',
     'emergency_visit_created_success' => 'Emergency visit created successfully for client :client_name at branch :branch_name',
     'emergency_visit_received' => 'Emergency Visit Received',
-    'emergency_visit_created_received' => 'Emergency visit Received successfully for client :client_name at branch :branch_name',
+    'emergency_visit_created_received' => 'Emergency visit Received successfully  at branch :branch_name',
     'view_details' => 'View Details',
     'visit_date' => 'Visit Date',
     'mark_as_complete' => 'Mark as Complete',

@@ -84,6 +84,8 @@ public static function table(Table $table): Table
 {
     return $table
         ->columns([
+            Tables\Columns\TextColumn::make('id')
+                ->label(__('message.id')),
             Tables\Columns\TextColumn::make('date')
                 ->label(__('message.date'))
                 ->dateTime('Y-m-d'),

@@ -116,7 +116,7 @@ return [
     'emergency_visit_created' => 'تم إنشاء زيارة طارئة',
     'emergency_visit_created_success' => 'تم إنشاء زيارة طارئة بنجاح للعميل :client_name في الفرع :branch_name',
     'emergency_visit_received' => 'تم استلام الزيارة الطارئة',
-    'emergency_visit_created_received' => 'تم استلام الزيارة الطارئة بنجاح للعميل :client_name في الفرع :branch_name من المشرف وجاري العمل عليها',
+    'emergency_visit_created_received' => 'تم تنفيذ الزيارة الطارئة بنجاح في الفرع :branch_name من المشرف وجاري العمل عليها',
     'view_details' => 'عرض التفاصيل',
     'visit_date' => 'تاريخ الزيارة',
     'mark_as_complete' => 'تمت الزيارة بالفعل',
