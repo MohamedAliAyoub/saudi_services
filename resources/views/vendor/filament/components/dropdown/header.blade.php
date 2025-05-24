@@ -28,7 +28,7 @@
 
 
 <img
-    src="{{ auth()->user()->image_url }}"
+    src="{{ auth()->user()?->image_url }}"
     class="h-6 w-6 rounded-full object-cover object-center"
 />    <span
         @class([

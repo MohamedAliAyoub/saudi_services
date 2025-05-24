@@ -4,7 +4,7 @@
 ])
 
 <img
-    src="{{ auth()->user()->image_url }}"
+    src="{{ auth()->user()?->image_url }}"
     {{
 
         $attributes
