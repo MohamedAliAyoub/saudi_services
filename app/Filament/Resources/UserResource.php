@@ -79,9 +79,10 @@ class UserResource extends Resource
                     ->label(__('message.Role'))
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\ImageColumn::make('image_url')
+                Tables\Columns\ImageColumn::make('image')
                     ->label(__('message.image'))
                     ->disk('public'),
+
                 Tables\Columns\TextColumn::make('address')
                     ->label(__('message.address'))
                     ->searchable()
@@ -130,7 +131,7 @@ class UserResource extends Resource
             ->whereIn('role', [
                 UserTypeEnum::EMPLOYEE,
                 UserTypeEnum::ADMIN,
-            ]);
+            ])->orderBy('id', 'desc');
     }
 
     public static function getNavigationBadge(): ?string

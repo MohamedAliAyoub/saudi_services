@@ -66,7 +66,7 @@
           </div>
            <div style="display: flex;justify-content: space-around;">
                <p><strong>{{ __('message.employee') }}:</strong> {{ $record->employee->name ?? __('message.not_available') }}</p>
-               <p><strong>{{ __('message.store') }}:</strong> {{ $record->store->name ?? __('message.not_available') }}</p>
+               <p><strong>{{ __('message.store') }}:</strong> {{ $record->store->translated_name ?? __('message.not_available') }}</p>
                <p><strong>{{ __('message.client') }}:</strong> {{ $record->client->name ?? __('message.not_available') }}</p>
                <p><strong>{{ __('message.rate') }}:</strong> {{ $record->rate ?? __('message.not_available') }}</p>
 
