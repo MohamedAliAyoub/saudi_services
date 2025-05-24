@@ -11,6 +11,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
@@ -126,6 +127,38 @@ class VisitResource extends Resource
             ->where('employee_id', auth()->id())
             ->with(['client', 'store'])
             ->orderByDesc('id');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('message.visits');
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::query()
+            ->where('employee_id', auth()->id())
+            ->count();
+    }
+
+    public static function getTitle(): string
+    {
+        return __('message.visit');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('message.visit');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('message.visit');
+    }
+
+    public static function getNavigationIcon(): string|Htmlable|null
+    {
+        return 'heroicon-o-arrow-right-circle';
     }
 }
 

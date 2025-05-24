@@ -54,8 +54,8 @@ class EditVisit extends EditRecord
             Notification::make()
                 ->title(__('message.visit_received_done'))
                 ->body(__('message.visit_received_done_message', [
-                    'client_name' => $this->record->client->name,
-                    'branch_name' => $this->record->store->address,
+                    'client_name' => $this->record->client?->name,
+                    'branch_name' => $this->record->store?->address,
                 ]))
                 ->icon('heroicon-o-calendar')
                 ->actions([
@@ -72,8 +72,8 @@ class EditVisit extends EditRecord
             Notification::make()
                 ->title(__('message.visit_received_done'))
                 ->body(__('message.visit_received_done_message', [
-                    'client_name' => $this->record->client->name,
-                    'branch_name' => $this->record->store->address,
+                    'client_name' => $this->record->client?->name,
+                    'branch_name' => $this->record->store?->address,
                 ]))
                 ->icon('heroicon-o-calendar')
                 ->actions([
