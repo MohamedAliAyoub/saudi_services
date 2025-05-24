@@ -116,7 +116,7 @@ return [
     'emergency_visit_created' => 'تم إنشاء زيارة طارئة',
     'emergency_visit_created_success' => 'تم إنشاء زيارة طارئة بنجاح للعميل :client_name في الفرع :branch_name',
     'emergency_visit_received' => 'تم استلام الزيارة الطارئة',
-    'emergency_visit_created_received' => 'تم استلام الزيارة الطارئة بنجاح للعميل :client_name في الفرع :branch_name',
+    'emergency_visit_created_received' => 'تم استلام الزيارة الطارئة بنجاح للعميل :client_name في الفرع :branch_name من المشرف وجاري العمل عليها',
     'view_details' => 'عرض التفاصيل',
     'visit_date' => 'تاريخ الزيارة',
     'mark_as_complete' => 'تمت الزيارة بالفعل',
@@ -125,7 +125,7 @@ return [
     'visit_received_done_message' => 'تمت الزيارة بنجاح للعميل :client_name في الفرع :branch_name',
     'save_visit' => 'تسجيل الزيارة',
     'id' => 'الرقم ',
-    'error'=> 'خطأ',
+    'error' => 'خطأ',
     'cannot_delete_service_in_use' => 'لا يمكن حذف هذه الخدمة لأنها قيد الاستخدام من قبل الشركاء.',
     'some_services_in_use' => 'لم يتم حذف الخدمات التالية لأنها قيد الاستخدام: :services',
 
