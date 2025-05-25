@@ -98,7 +98,8 @@ class VisitResource extends Resource
               // filter by store name
                 Tables\Filters\Filter::make('store')
                     ->query(fn (Builder $query, array $data) => $query->whereHas('store', function (Builder $query) use ($data) {
-                        $query->where('address', 'like', '%' . $data['value'] . '%');
+                        $query->where('address', 'like', '%' . $data['value'] . '%')
+                            ->orWhere('name', 'like', '%' . $data['value'] . '%');
                     }))
                     ->form([
                         Forms\Components\TextInput::make('value')
