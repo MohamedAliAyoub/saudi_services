@@ -15,6 +15,7 @@ use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use function Laravel\Prompts\search;
 
 class VisitResource extends Resource
 {
@@ -73,7 +74,9 @@ class VisitResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('id')
-                    ->label(__('message.id')),
+                    ->label(__('message.id'))
+                    ->sortable()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('client.name')
                     ->label(__('message.client')),
                 Tables\Columns\TextColumn::make('store.address')
@@ -93,7 +96,16 @@ class VisitResource extends Resource
                     ),
             ])
             ->filters([
-                //
+              // filter by store name
+                Tables\Filters\Filter::make('store')
+                    ->query(fn (Builder $query, array $data) => $query->whereHas('store', function (Builder $query) use ($data) {
+                        $query->where('address', 'like', '%' . $data['value'] . '%');
+                    }))
+                    ->form([
+                        Forms\Components\TextInput::make('value')
+                            ->label(__('message.store'))
+                            ->required(),
+                    ]),
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
