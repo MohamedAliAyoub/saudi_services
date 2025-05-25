@@ -115,6 +115,11 @@ class VisitResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make()
                     ->label(__('message.save_visit')),
+
+
+                Tables\Actions\ViewAction::make()
+                    ->label(__('message.view'))
+                    ->url(fn (Visit $record) => route('filament.employee.resources.visits.view', ['record' => $record])),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

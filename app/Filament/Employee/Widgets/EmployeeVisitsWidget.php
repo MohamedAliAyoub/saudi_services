@@ -40,8 +40,9 @@ class EmployeeVisitsWidget extends BaseWidget
               ),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ViewAction::make()
+                    ->label(__('message.save_visit'))
+                    ->url(fn (Visit $record) => route('filament.employee.resources.visits.edit', ['record' => $record])),
             ])
             ->paginated([10, 25, 50]);
     }
