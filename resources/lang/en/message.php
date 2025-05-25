@@ -134,6 +134,7 @@ return [
     'view_contract' => 'عرض العقد',
     'view_pdf' => 'View PDF',
     'no_pdf' => 'No PDF uploaded yet',
+    'edit_visit_for' => 'Edit Visit for :store ID :id',
 
 
     ];

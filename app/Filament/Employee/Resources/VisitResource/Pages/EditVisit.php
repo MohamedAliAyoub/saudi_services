@@ -86,5 +86,13 @@ class EditVisit extends EditRecord
         }
     }
 
+   public function getTitle(): string
+    {
+        return __('message.edit_visit_for', [
+            'store' => $this->record->store->address ?? '',
+            'id' => $this->record->store->id ?? ''
+        ]);
+    }
+
 
 }

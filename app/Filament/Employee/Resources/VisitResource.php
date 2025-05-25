@@ -28,6 +28,11 @@ class VisitResource extends Resource
             ->schema([
                 Forms\Components\Grid::make()
                     ->schema([
+                        // add id without edit it just show
+                        Forms\Components\TextInput::make('id')
+                            ->label(__('message.id'))
+                            ->disabled()
+                            ->default(fn ($record) => $record ? $record->id : null),
                         Forms\Components\Checkbox::make('mark_as_complete')
                             ->label(__('message.mark_as_complete'))
                             ->reactive()
