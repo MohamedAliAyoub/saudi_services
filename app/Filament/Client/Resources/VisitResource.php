@@ -129,12 +129,16 @@ public static function table(Table $table): Table
                 ->tooltip(fn($record) => $record->comment),
         ])
         ->filters([
-            Tables\Filters\SelectFilter::make('store_id')
+            Tables\Filters\Filter::make('store')
                 ->label(__('message.store'))
-                ->attribute('store_id'),
-            Tables\Filters\SelectFilter::make('status')
-                ->label(__('message.status'))
-                ->options(VisitTypeEnum::asSelectArray()),
+                ->query(fn (Builder $query, array $data) => $query->whereHas('store', function (Builder $query) use ($data) {
+                    $query->where('address', 'like', '%' . $data['value'] . '%')
+                        ->orWhere('name', 'like', '%' . $data['value'] . '%');
+                }))
+                ->form([
+                    Forms\Components\TextInput::make('value')
+                        ->label(__('message.store')),
+                ]),
         ])
         ->actions([
             Tables\Actions\EditAction::make()

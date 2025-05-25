@@ -102,14 +102,14 @@ class VisitResource extends Resource
             ->filters([
               // filter by store name
                 Tables\Filters\Filter::make('store')
+                    ->label(__('message.store'))
                     ->query(fn (Builder $query, array $data) => $query->whereHas('store', function (Builder $query) use ($data) {
                         $query->where('address', 'like', '%' . $data['value'] . '%')
                             ->orWhere('name', 'like', '%' . $data['value'] . '%');
                     }))
                     ->form([
                         Forms\Components\TextInput::make('value')
-                            ->label(__('message.store'))
-                            ->required(),
+                            ->label(__('message.store')),
                     ]),
             ])
             ->actions([
