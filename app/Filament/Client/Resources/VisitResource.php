@@ -178,7 +178,7 @@ public static function table(Table $table): Table
 
     public static function getNavigationBadge(): ?string
     {
-        return static::getModel()::query()->where('id', auth()->id())->count();
+        return static::getModel()::query()->where('client_id', auth()->id())->count();
     }
 
     public static function getTitle(): string
@@ -207,6 +207,7 @@ public static function table(Table $table): Table
 
         Visit::updateStatus();
         $query = parent::getEloquentQuery()
+            ->where('client_id', auth()->id())
             ->with(['store', 'client', 'employee', 'services', 'images'])
             ->orderByRaw("status = ? DESC", [VisitTypeEnum::EMERGENCY->value])
             ->orderBy('id', 'desc');
