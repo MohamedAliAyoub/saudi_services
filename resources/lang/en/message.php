@@ -130,5 +130,11 @@ return [
     'some_services_in_use' => 'The following services could not be deleted because they are in use: :services',
     'emergency_visit_assigned_to_employee' => 'Emergency visit assigned to employee',
     'emergency_visit_created_assigned' => 'Emergency visit created and assigned to you form client :client_name at branch :branch_name',
-];
+    'pdf_contract' => 'PDF Contract',
+    'view_contract' => 'عرض العقد',
+    'view_pdf' => 'View PDF',
+    'no_pdf' => 'No PDF uploaded yet',
+
+
+    ];
 

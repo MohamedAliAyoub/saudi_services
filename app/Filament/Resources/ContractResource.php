@@ -15,9 +15,12 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Support\Enums\IconPosition;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
+
 
 class ContractResource extends Resource
 {
@@ -114,7 +117,12 @@ class ContractResource extends Resource
                                         self::validateContractDates($get('contract_create_date'), $state, $get('client_id'), $set);
                                         self::updateStores(null, $get, $set);
                                     }),
-
+                                Forms\Components\SpatieMediaLibraryFileUpload::make('pdf_path')
+                                    ->label(__('message.pdf_contract'))
+                                    ->collection('contract_pdfs')
+                                    ->directory('contracts/pdfs')
+                                    ->acceptedFileTypes(['application/pdf'])
+                                    ->maxSize(10240),
 
                             ]),
 
@@ -142,7 +150,7 @@ class ContractResource extends Resource
                                         Select::make('employee_id')
                                             ->label(__('message.employee'))
                                             ->options(\App\Models\Employee::pluck('name', 'id')->toArray())
-                                            ->required(fn (string $context): bool => $context === 'create')
+                                            ->required(fn(string $context): bool => $context === 'create')
                                             ->reactive()
                                             ->afterStateUpdated(function ($state, callable $get, callable $set, $livewire) {
                                                 // Get the current visits array from the store
@@ -180,11 +188,11 @@ class ContractResource extends Resource
 
                                                         Select::make('employee_id')
                                                             ->label(__('message.employee'))
-                                                            ->options(function() {
+                                                            ->options(function () {
                                                                 return \App\Models\Employee::all()->mapWithKeys(function ($employee) {
-                                                                    return [$employee->id => ($employee->name['ar'] ?? $employee->name) ];
+                                                                    return [$employee->id => ($employee->name['ar'] ?? $employee->name)];
                                                                 })->toArray();
-                                                            })                                                            ->nullable(),
+                                                            })->nullable(),
                                                     ]),
                                             ])
                                             ->columns(1),
@@ -276,14 +284,27 @@ class ContractResource extends Resource
                     ->date()
                     ->sortable(),
 
-               Tables\Columns\IconColumn::make('status')
-                   ->label(__('message.status'))
-                   ->boolean()
-                   ->getStateUsing(fn (Contract $record): bool => $record->status === 'active')
-                   ->trueIcon('heroicon-o-check-circle')
-                   ->falseIcon('heroicon-o-x-circle')
-                   ->trueColor('success')
-                   ->falseColor('danger'),
+
+        Tables\Columns\TextColumn::make('pdf_path')
+            ->label(__('message.pdf_contract'))
+            ->state(function (Contract $record) {
+                return $record->getFirstMedia('contract_pdfs') ? __('message.view_pdf') :'';
+            })
+            ->icon('heroicon-o-document')
+            ->iconPosition(IconPosition::Before)
+            ->color('primary')
+            ->url(fn(Contract $record) => $record->getFirstMedia('contract_pdfs')?->getUrl() ?? '#')
+            ->openUrlInNewTab(),
+                Tables\Columns\IconColumn::make('status')
+                    ->label(__('message.status'))
+                    ->boolean()
+                    ->getStateUsing(fn(Contract $record): bool => $record->status === 'active')
+                    ->trueIcon('heroicon-o-check-circle')
+                    ->falseIcon('heroicon-o-x-circle')
+                    ->trueColor('success')
+                    ->falseColor('danger'),
+
+
             ])
             ->filters([
                 //
@@ -364,114 +385,114 @@ class ContractResource extends Resource
     }
 
 
-protected static function updateStores($state, callable $get, callable $set)
-{
-    $storeNumbers = (int)$get('store_numbers');
-    $visitsNumber = (int)$get('visits_number');
-    $contractStart = $get('contract_create_date');
-    $contractEnd = $get('contract_end_date');
+    protected static function updateStores($state, callable $get, callable $set)
+    {
+        $storeNumbers = (int)$get('store_numbers');
+        $visitsNumber = (int)$get('visits_number');
+        $contractStart = $get('contract_create_date');
+        $contractEnd = $get('contract_end_date');
 
-    // Check if we have valid inputs
-    if ($storeNumbers <= 0 || $visitsNumber <= 0 || empty($contractStart) || empty($contractEnd)) {
-        \Log::warning('[Update Stores in Contract] Missing or invalid input values');
-        return;
-    }
+        // Check if we have valid inputs
+        if ($storeNumbers <= 0 || $visitsNumber <= 0 || empty($contractStart) || empty($contractEnd)) {
+            \Log::warning('[Update Stores in Contract] Missing or invalid input values');
+            return;
+        }
 
-    try {
-        $contractStart = \Carbon\Carbon::parse($contractStart);
-        $contractEnd = \Carbon\Carbon::parse($contractEnd);
-    } catch (\Exception $e) {
-        \Log::error('[Update Stores in Contract] Error parsing contract dates', ['error' => $e->getMessage()]);
-        return;
-    }
+        try {
+            $contractStart = \Carbon\Carbon::parse($contractStart);
+            $contractEnd = \Carbon\Carbon::parse($contractEnd);
+        } catch (\Exception $e) {
+            \Log::error('[Update Stores in Contract] Error parsing contract dates', ['error' => $e->getMessage()]);
+            return;
+        }
 
-    // First check for existing stores in the form data
-    $currentFormStores = $get('stores') ?? [];
-    $sessionStores = session('copied_stores', []);
+        // First check for existing stores in the form data
+        $currentFormStores = $get('stores') ?? [];
+        $sessionStores = session('copied_stores', []);
 
-    // Log for debugging
-    \Log::info('[Update Stores in Contract] Current Data:', [
-        'form_stores' => $currentFormStores,
-        'session_stores' => $sessionStores,
-    ]);
+        // Log for debugging
+        \Log::info('[Update Stores in Contract] Current Data:', [
+            'form_stores' => $currentFormStores,
+            'session_stores' => $sessionStores,
+        ]);
 
-    $baseVisitsPerStore = (int)floor($visitsNumber / $storeNumbers);
-    $extraVisits = $visitsNumber % $storeNumbers;
+        $baseVisitsPerStore = (int)floor($visitsNumber / $storeNumbers);
+        $extraVisits = $visitsNumber % $storeNumbers;
 
-    // Prioritize form data over session data
-    if (!empty($currentFormStores)) {
-        // Update visits for existing form stores
-        $updatedStores = [];
-        for ($i = 0; $i < $storeNumbers; $i++) {
-            $visitsForThisStore = $baseVisitsPerStore + ($i < $extraVisits ? 1 : 0);
-            $visitDates = self::generateVisitDates($visitsForThisStore, $contractStart, $contractEnd);
+        // Prioritize form data over session data
+        if (!empty($currentFormStores)) {
+            // Update visits for existing form stores
+            $updatedStores = [];
+            for ($i = 0; $i < $storeNumbers; $i++) {
+                $visitsForThisStore = $baseVisitsPerStore + ($i < $extraVisits ? 1 : 0);
+                $visitDates = self::generateVisitDates($visitsForThisStore, $contractStart, $contractEnd);
 
-            // Preserve existing store data if available
-            if (isset($currentFormStores[$i])) {
-                $store = $currentFormStores[$i];
-                $store['visits'] = $visitDates;
-                $updatedStores[] = $store;
-            } else {
-                // If we need more stores than currently exist
-                $updatedStores[] = [
+                // Preserve existing store data if available
+                if (isset($currentFormStores[$i])) {
+                    $store = $currentFormStores[$i];
+                    $store['visits'] = $visitDates;
+                    $updatedStores[] = $store;
+                } else {
+                    // If we need more stores than currently exist
+                    $updatedStores[] = [
+                        'name' => [
+                            'ar' => '',
+                            'en' => '',
+                        ],
+                        'address' => '',
+                        'phone' => '',
+                        'visits' => $visitDates,
+                    ];
+                }
+            }
+            $set('stores', $updatedStores);
+        } elseif (!empty($sessionStores)) {
+            // Use session data for copying contracts
+            $updatedStores = [];
+            for ($i = 0; $i < $storeNumbers; $i++) {
+                $visitsForThisStore = $baseVisitsPerStore + ($i < $extraVisits ? 1 : 0);
+                $visitDates = self::generateVisitDates($visitsForThisStore, $contractStart, $contractEnd);
+
+                if (isset($sessionStores[$i])) {
+                    $store = $sessionStores[$i];
+                    $store['visits'] = $visitDates;
+                    $updatedStores[] = $store;
+                } else {
+                    // If we need more stores than in session
+                    $updatedStores[] = [
+                        'name' => [
+                            'ar' => '',
+                            'en' => '',
+                        ],
+                        'address' => '',
+                        'phone' => '',
+                        'visits' => $visitDates,
+                    ];
+                }
+            }
+            $set('stores', $updatedStores);
+        } else {
+            // Generate new stores if no existing data
+            $stores = collect(range(1, $storeNumbers))->map(function ($index) use ($baseVisitsPerStore, $extraVisits, $contractStart, $contractEnd) {
+                $visitsForThisStore = $baseVisitsPerStore + ($index <= $extraVisits ? 1 : 0);
+                $visits = self::generateVisitDates($visitsForThisStore, $contractStart, $contractEnd);
+
+                return [
                     'name' => [
                         'ar' => '',
                         'en' => '',
                     ],
                     'address' => '',
                     'phone' => '',
-                    'visits' => $visitDates,
+                    'visits' => $visits,
                 ];
-            }
+            });
+
+            $set('stores', $stores->toArray());
         }
-        $set('stores', $updatedStores);
     }
-    elseif (!empty($sessionStores)) {
-        // Use session data for copying contracts
-        $updatedStores = [];
-        for ($i = 0; $i < $storeNumbers; $i++) {
-            $visitsForThisStore = $baseVisitsPerStore + ($i < $extraVisits ? 1 : 0);
-            $visitDates = self::generateVisitDates($visitsForThisStore, $contractStart, $contractEnd);
 
-            if (isset($sessionStores[$i])) {
-                $store = $sessionStores[$i];
-                $store['visits'] = $visitDates;
-                $updatedStores[] = $store;
-            } else {
-                // If we need more stores than in session
-                $updatedStores[] = [
-                    'name' => [
-                        'ar' => '',
-                        'en' => '',
-                    ],
-                    'address' => '',
-                    'phone' => '',
-                    'visits' => $visitDates,
-                ];
-            }
-        }
-        $set('stores', $updatedStores);
-    }
-    else {
-        // Generate new stores if no existing data
-        $stores = collect(range(1, $storeNumbers))->map(function ($index) use ($baseVisitsPerStore, $extraVisits, $contractStart, $contractEnd) {
-            $visitsForThisStore = $baseVisitsPerStore + ($index <= $extraVisits ? 1 : 0);
-            $visits = self::generateVisitDates($visitsForThisStore, $contractStart, $contractEnd);
-
-            return [
-                'name' => [
-                    'ar' => '',
-                    'en' => '',
-                ],
-                'address' => '',
-                'phone' => '',
-                'visits' => $visits,
-            ];
-        });
-
-        $set('stores', $stores->toArray());
-    }
-}    protected static function isCopyingContract(): bool
+    protected static function isCopyingContract(): bool
     {
         $currentUrl = request()->url();
         return str_contains($currentUrl, '/contracts/copy/');

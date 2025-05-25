@@ -129,6 +129,14 @@ class ClientResource extends Resource
                                     ->afterStateUpdated(function ($state, callable $get, callable $set) {
                                         self::updateStores(null, $get, $set);
                                     }),
+
+                                Forms\Components\SpatieMediaLibraryFileUpload::make('pdf_path')
+                                    ->label(__('message.pdf_contract'))
+                                    ->collection('contract_pdfs')
+                                    ->directory('contracts/pdfs')
+                                    ->acceptedFileTypes(['application/pdf'])
+                                    ->maxSize(10240),
+
                             ]),
 
                         Forms\Components\Repeater::make('stores')

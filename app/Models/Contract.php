@@ -8,10 +8,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Support\Facades\Storage;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-class Contract extends Model
+class Contract extends Model implements HasMedia
 {
-    use HasFactory;
+    use HasFactory, InteractsWithMedia;
 
     protected $with = ['services'];
     protected $fillable = [
@@ -21,11 +24,12 @@ class Contract extends Model
         'contract_end_date',
         'client_id',
         'status',
+        'pdf_path'
     ];
 
-    // In app/Models/Contract.php
 
     protected $appends = ['name'];
+
 
     public function getNameAttribute(): string
     {
@@ -61,5 +65,11 @@ class Contract extends Model
         return $this->hasManyThrough(Visit::class, Store::class);
     }
 
+
+    public function getPdfUrlAttribute(): string
+    {
+        $media = $this->getFirstMedia('contract_pdfs');
+        return $media ? $media->getUrl() : '';
+    }
 
 }

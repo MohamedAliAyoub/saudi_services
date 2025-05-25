@@ -2,3 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 @tailwind variants;
+
+.pdf-icon-cell::before {
+    content: '';
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background: url('uploads/images/1.jpg') no-repeat;
+    background-size: contain;
+    margin-right: 8px;
+    vertical-align: middle;
+}

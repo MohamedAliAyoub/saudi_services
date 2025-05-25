@@ -116,7 +116,7 @@ return [
     'emergency_visit_created' => 'تم إنشاء زيارة طارئة',
     'emergency_visit_created_success' => 'تم إنشاء زيارة طارئة بنجاح للعميل :client_name في الفرع :branch_name',
     'emergency_visit_received' => 'تم استلام الزيارة الطارئة',
-    'emergency_visit_created_received' => 'تم تنفيذ الزيارة الطارئة بنجاح في الفرع :branch_name من المشرف وجاري العمل عليها',
+    'emergency_visit_created_received' => 'تم استلام الزيارة الطارئة بنجاح في الفرع :branch_name من المشرف وجاري العمل عليها',
     'view_details' => 'عرض التفاصيل',
     'visit_date' => 'تاريخ الزيارة',
     'mark_as_complete' => 'تمت الزيارة بالفعل',
@@ -130,4 +130,9 @@ return [
     'some_services_in_use' => 'لم يتم حذف الخدمات التالية لأنها قيد الاستخدام: :services',
     'emergency_visit_assigned_to_employee' => 'تم تعيينك في زيارة طارئة ',
     'emergency_visit_created_assigned' => 'تم إنشاء زيارة طارئة وتعيينها لك من العميل :client_name في الفرع :branch_name',
-];
+    'pdf_contract' => 'عقد PDF',
+    'view_contract' => 'عرض العقد',
+    'view_pdf' => 'عرض عقد ',
+    'no_pdf' => 'لم يتم تحميل عقد PDF بعد',
+
+    ];
