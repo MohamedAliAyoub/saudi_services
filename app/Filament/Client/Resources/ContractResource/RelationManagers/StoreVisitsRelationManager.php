@@ -16,6 +16,10 @@ class StoreVisitsRelationManager extends RelationManager
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('id')
+                    ->label(__('message.id'))
+                    ->sortable()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('date')
                     ->label(__('message.date'))
                     ->date(),

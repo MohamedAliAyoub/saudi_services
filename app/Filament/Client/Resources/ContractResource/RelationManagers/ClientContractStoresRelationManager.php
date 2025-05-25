@@ -16,6 +16,10 @@ class ClientContractStoresRelationManager extends RelationManager
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('id')
+                    ->label(__('message.id'))
+                    ->sortable()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('translated_name')
                     ->label(__('message.name')),
                 Tables\Columns\TextColumn::make('address')
