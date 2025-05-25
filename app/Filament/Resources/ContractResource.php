@@ -262,6 +262,10 @@ class ContractResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('id')
+                    ->label(__('message.id'))
+                    ->sortable()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('client.name')
                     ->label(__('message.client'))
                     ->searchable(),

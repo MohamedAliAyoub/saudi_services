@@ -32,6 +32,10 @@ public static function table(Table $table): Table
 {
     return $table
         ->columns([
+            Tables\Columns\TextColumn::make('id')
+                ->label(__('message.id'))
+                ->sortable()
+                ->searchable(),
             Tables\Columns\Layout\Stack::make([
                 Tables\Columns\ImageColumn::make('logo')
                     ->height('100%')

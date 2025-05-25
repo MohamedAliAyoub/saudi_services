@@ -34,6 +34,10 @@ class StoreResource extends Resource
     {
         return $form
             ->schema([
+                Tables\Columns\TextColumn::make('id')
+                    ->label(__('message.id'))
+                    ->sortable()
+                    ->searchable(),
                 TextInput::make('name.en')
                     ->label(__('message.name_en'))
                     ->required(),

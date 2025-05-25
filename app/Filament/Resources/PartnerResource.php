@@ -24,6 +24,10 @@ class PartnerResource extends Resource
     {
         return $form
             ->schema([
+                Tables\Columns\TextColumn::make('id')
+                    ->label(__('message.id'))
+                    ->sortable()
+                    ->searchable(),
                 Forms\Components\TextInput::make('name')
                     ->label(__('message.name'))
                     ->required(),

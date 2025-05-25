@@ -224,6 +224,10 @@ class ClientResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('id')
+                    ->label(__('message.id'))
+                    ->sortable()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('name_ar')
                     ->label(__('message.name'))
                     ->getStateUsing(fn($record) => $record->name ?? null),
