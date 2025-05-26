@@ -135,6 +135,11 @@ return [
     'view_pdf' => 'عرض عقد ',
     'no_pdf' => 'لم يتم تحميل عقد PDF بعد',
     'edit_visit_for' => 'تعديل زيارة لـ :store رقم :id',
-
+    'slider_image' => 'صورة العرض',
+    'slider_images' => 'صور العرض',
+    'title' => 'العنوان',
+    'description' => 'الوصف',
+    'order' => 'الترتيب',
+    'active' => 'نشط',
 
     ];

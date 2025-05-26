@@ -135,7 +135,12 @@ return [
     'view_pdf' => 'View PDF',
     'no_pdf' => 'No PDF uploaded yet',
     'edit_visit_for' => 'Edit Visit for :store ID :id',
+    'slider_image' => 'Slider Image',
+    'slider_images' => 'Slider Images',
+    'title' => 'Title',
+    'description' => 'Description',
+    'order' => 'Order',
+    'active' => 'Active',
 
-
-    ];
+];
 

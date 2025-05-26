@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Client\Widgets\SliderWidget;
 use App\Filament\Client\Widgets\StatsOverviewWidget;
 use App\Filament\Resources\AdminResource\Widgets\AdminImageWidget;
 use App\Filament\Resources\AdminResource\Widgets\ClientImageWidget;
@@ -17,7 +18,6 @@ use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
-use Filament\Widgets;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -51,8 +51,10 @@ class ClientPanelProvider extends PanelProvider
             ->pages([
                 Pages\Dashboard::class,
             ])
-            ->discoverWidgets(in: app_path('Filament/Client/Widgets'), for: 'App\\Filament\\Client\\Widgets')
+        ->discoverWidgets(in: app_path('Filament/Client/Widgets'), for: 'App\\Filament\\Client\\Widgets')
+
             ->widgets([
+                SliderWidget::class,
                 AdminImageWidget::class,
                 ClientImageWidget::class,
                 StatsOverviewWidget::class
@@ -88,7 +90,6 @@ class ClientPanelProvider extends PanelProvider
             ->sidebarCollapsibleOnDesktop();
 
     }
-
 
 
 
