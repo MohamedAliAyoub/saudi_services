@@ -24,6 +24,8 @@
         x-init="startAutoplay()"
         class="relative w-full overflow-hidden"
         style="height: 50vh; width: 900px;">
+    {{--    style="height: 50vh; width: 95vw;max-width: 100vw;">--}}
+
 
     >
         <!-- Slide -->
